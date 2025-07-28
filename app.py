@@ -102,7 +102,7 @@ for text, col in suggestions.items():
         set_query(text)
 
 # API calling function
-API_URL = "http://127.0.0.1:8000/chat"
+API_URL = "https://fashion-chatbot.onrender.com/chat"
 USER_ID = "streamlit_user_01" # A static user ID for this session
 
 def get_bot_response(user_id, message):
