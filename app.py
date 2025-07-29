@@ -3,19 +3,6 @@ import streamlit as st
 import requests
 import json
 
-# Top: logo and title side by side
-cols = st.columns([1, 3])  # Adjust the width ratio as needed (logo:title)
-
-with cols[0]:
-    st.image("https://github.com/pranay0923/fashion-chatbot-frontend/blob/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg", use_container_width=True)
-
-with cols[1]:
-    st.markdown(
-        "<h1 style='padding-top: 18px; text-align: left; "
-        "font-family: Montserrat, Segoe UI, Arial, sans-serif; "
-        "color: #1a2c36; font-weight:700; letter-spacing:0.07em;'>Style Pat Fashion AI</h1>",
-        unsafe_allow_html=True,
-    )
 
 # --- CSS for the Look and Feel ---
 st.markdown("""
