@@ -5,9 +5,9 @@ import json
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="Style Pat Fashion AI",
-    page_icon="https://raw.githubusercontent.com/pranay0923/fashion-chatbot-frontend/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg",
-    layout="wide",
+    page_title="Fashion AI",
+    page_icon="✨",
+    layout="centered",
     initial_sidebar_state="collapsed"
 )
 
