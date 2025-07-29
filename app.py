@@ -14,19 +14,20 @@ st.set_page_config(
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    /* === Main app background: soft teal gradient === */
+    /* Gemini-like neutral, bright background */
     .stApp {
-      background: linear-gradient(120deg, #e0f7fa 0%, #ede7f6 100%);
+      background: #f9f9fd !important;
       min-height: 100vh;
-      font-family: 'Segoe UI', 'Nunito', 'Arial Rounded MT Bold', Arial, sans-serif !important;
     }
 
-    /* === Logo: playful green-purple gradient text === */
+    /* Logo: simple, clean, hint of Gemini blue/purple gradient */
     .logo {
       font-size: 2.15em;
       font-weight: 800;
+      letter-spacing: -.5px;
       margin-bottom: .52em;
-      background: linear-gradient(90deg, #43e97b 20%, #38f9d7 60%, #8066ee 100%);
+      color: #222;
+      background: linear-gradient(90deg,#80aaff 30%,#ad8aff 70%);
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
@@ -36,49 +37,92 @@ st.markdown("""
       font-size: 1.62em;
       font-weight: 760;
       margin-bottom: .7em;
-      color: #264653;
-      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif !important;
+      color: #1a1745;
     }
 
     header, footer {visibility: hidden; height: 0 !important;}
 
-    /* Main content area */
+    /* Main content centered, with extra white space */
     .main .block-container {
       padding-top: 2.2rem;
       padding-bottom: 4rem;
       max-width: 600px;
       margin: 0 auto;
       box-sizing: border-box;
-      font-family: 'Segoe UI', 'Nunito', Arial, sans-serif !important;
     }
 
-    /* --- Chat bubbles: super-light gradients --- */
+    /* Chat bubbles: sleek, Gemini-inspired, pill shape, shadow, soft divides */
     .chat-bubble {
       width: 100%;
       box-sizing: border-box;
       padding: 18px 24px;
       border-radius: 22px;
       margin-bottom: 16px;
-      font-size: 1.07em;
-      background: #f6fff7;
-      color: #1c2331;
-      box-shadow: 0 2.5px 17px 0 #82c1e90c, 0 0.7px 5px 0 #b9f6c942;
+      font-size: 1.06em;
+      background: #fff;
+      color: #1a1745;
+      box-shadow: 0 2.5px 17px 0 #a58fff10, 0 0.7px 5px 0 #c0d4f942;
       border: none;
       white-space: pre-line;
-      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif !important;
+      font-family: 'Inter', system-ui, Arial, sans-serif;
     }
     .user-bubble {
-      background: linear-gradient(94deg, #d0f5f8 61%, #ede7f6 100%);
-      color: #00695c;
+      background: linear-gradient(95deg, #e8edfa 60%, #f7f5ff 100%);
+      color: #4527A0;
+      margin-left: auto;
       border-radius: 26px 18px 22px 26px;
-      border: 0.5px solid #b2f0ec41;
-      box-shadow: 0 2px 14px #43e97b14;
+      border: 0.5px solid #d7dbfd68;
+      box-shadow: 0 2px 14px #ad8aff22;
       text-align: right;
-      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif !important;
     }
     .assistant-bubble {
-      background: linear-gradient(
+      background: linear-gradient(92deg,#f6f6fe 61%,#e8f3ff 100%);
+      color: #1a1745;
+      margin-right: auto;
+      border-radius: 18px 26px 26px 22px;
+      border: 0.5px solid #d7dbfd1f;
+      box-shadow: 0 2px 14px #80aaff22;
+    }
 
+    /* Buttons: smooth, flat, blueish highlight on hover, Gemini-ish */
+    .stButton>button {
+      background: #fff;
+      color: #5a43d6;
+      border-radius: 19px;
+      border: 1.3px solid #d7dbfd;
+      font-size: 1.02em;
+      font-weight: 600;
+      padding: 0.6em 1.2em;
+      margin-bottom: 0.9em;
+      box-shadow: 0 1px 6px #f6f6fe31;
+      transition: border 0.12s, background 0.12s, color 0.12s;
+    }
+    .stButton>button:hover {
+      background: linear-gradient(95deg,#eceeff 80%,#e0fafb 100%);
+      color: #342993;
+      border: 1.3px solid #80aaff;
+    }
+
+    /* Text input: flat, border, highlight blue on focus, Gemini-style */
+    .stTextInput>div>div>input {
+      background: #fff;
+      border-radius: 12px;
+      border: 1.7px solid #d7dbfd;
+      font-size: 1.08em;
+      color: #2d2a59;
+      font-weight: 500;
+      box-shadow: 0 1.5px 9px #ad8aff1a;
+      padding: 15px 15px !important;
+      margin-bottom: 1.35em;
+      transition: border 0.13s;
+    }
+    .stTextInput>div>div>input:focus {
+      border: 2px solid #6e6eea !important;
+      outline: none;
+      background: #f4faff;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 
 # --- UI Layout ---
