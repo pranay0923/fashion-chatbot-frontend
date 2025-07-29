@@ -5,7 +5,7 @@ import json
 
 cols = st.columns([1, 3])
 with cols[0]:
-    st.image("WhatsApp-Image-2025-07-29-at-12.03.57-PM.jpg", use_container_width=True)
+    st.image("https://github.com/pranay0923/fashion-chatbot-frontend/blob/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg", use_container_width=True)
 with cols[1]:
     st.markdown(
         "<h1 style='padding-top: 26px; padding-left: 12px; margin-bottom:0; "
