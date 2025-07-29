@@ -14,59 +14,122 @@ st.set_page_config(
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    /* Main app background */
+    /* Animated vibrant background */
+    @keyframes gradientMove {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
     .stApp {
-        background-color: #f0f2f6; /* A light grey background */
-        background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
-        height: 100vh;
+        background: linear-gradient(135deg, #f9f5ff, #fceabb, #f8bfae, #b9deed);
+        background-size: 400% 400%;
+        animation: gradientMove 12s ease-in-out infinite;
+        min-height: 100vh;
     }
-    /* Main content area alignment */
-    .main .block-container {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-        text-align: center;
-    }
-    /* Hide Streamlit's default header and footer */
-    header, footer {
-        visibility: hidden;
-    }
-    /* Style for the logo */
+    /* Logo – animate a shine */
     .logo {
-        font-size: 2.5em;
+        font-size: 2.7em;
         margin-bottom: 0.5em;
+        background: linear-gradient(90deg, #f76767, #ffb347 50%, #fffa8b 80%, #a0e6fc);
+        background-size: 200%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: shine 2s linear infinite alternate;
     }
-    /* Style for suggestion buttons */
+    @keyframes shine {
+        from {
+            background-position: left;
+        }
+        to {
+            background-position: right;
+        }
+    }
+    /* Fancy title */
+    h1 {
+        text-align: center;
+        font-size: 2.4em;
+        background: linear-gradient(90deg,#4233d4,#CB2D3e,#ef473a,#F7971E);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        color: transparent;
+        animation: shine 3s alternate infinite;
+        letter-spacing: 1px;
+        margin-bottom: 0.6em;
+        font-weight: 900;
+    }
+    /* Suggestion buttons: vibrant, glowing on hover */
     .stButton>button {
-        background-color: #ffffff;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        padding: 0.5em 1em;
-        color: #333;
-        font-weight: normal;
-        transition: all 0.2s;
+        background: linear-gradient(90deg, #fff7e4, #ffe3e3 60%, #ffe6fa);
+        border: 2px solid #ecc3c3;
+        border-radius: 17px;
+        padding: 0.6em 1.3em;
+        color: #4233d4;
+        font-weight: 600;
+        font-size: 1.12em;
+        margin-bottom: 1.2em;
+        box-shadow: 0 2px 7px 0 rgba(249,108,158,.13), 0 0 0 0 #ef62b7;
+        transition: all 0.25s;
     }
     .stButton>button:hover {
-        border-color: #888;
-        color: #000;
+        transform: translateY(-2px) scale(1.04);
+        border-color: #f76767;
+        color: #fff;
+        background: linear-gradient(95deg, #F7971E 10%, #CB2D3e 90%);
+        box-shadow: 0 2px 14px 4px #ffbb55b7, 0 0 8px 2px #5236ec55;
     }
-    /* Style for chat history */
+    /* Hide Streamlit's header/footer */
+    header, footer { visibility: hidden; height:0 !important; }
+    /* Chat bubbles: card-like, modern, vibrant, drop shadow */
     .chat-bubble {
-        padding: 10px 15px;
-        border-radius: 15px;
-        margin-bottom: 10px;
-        max-width: 70%;
+        padding: 15px 23px;
+        border-radius: 16px 24px 18px 16px;
+        margin-bottom: 12px;
+        max-width: 80vw;
         display: inline-block;
-        text-align: left;
+        font-size: 1.13em;
+        box-shadow: 0 5px 24px 1px rgba(85,85,185,0.04), 0 2px 8px 0 #f7676733;
+        border: 1px solid rgba(0,0,0,0.03);
     }
     .user-bubble {
-        background-color: #0b93f6;
-        color: white;
+        background: linear-gradient(140deg, #a0e6fc, #fffdc2, #fff 95%);
+        color: #4233d4;
+        text-align: right;
         margin-left: auto;
+        box-shadow: 0 0 16px 2px #a0e6fc33;
+        border-top-right-radius: 35px;
     }
     .assistant-bubble {
-        background-color: #e5e5ea;
-        color: black;
+        background: linear-gradient(140deg,#ef62b7 18%, #cb2d3e05 48%, #fff9c6 94%);
+        color: #cb2d3e;
         margin-right: auto;
+        box-shadow: 0 0 18px 2px #ef62b722;
+        border-top-left-radius: 32px;
+    }
+    /* Chat container padding */
+    .main .block-container {
+        padding-top: 4rem;
+        padding-bottom: 5rem;
+        align-items: center;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+    /* Text input: subtle style, big enough */
+    .stTextInput>div>div>input {
+        background: linear-gradient(90deg,#fff7e4 60%,#bad1ff1b 100%);
+        color: #CB2D3e;
+        border-radius: 10px;
+        border: 2px solid #efd8f7;
+        font-size: 1.17em;
+        font-weight: 500;
+        box-shadow: 0 3px 8px 0 #a0e6fc28;
+        padding: 14px 13px !important;
+        transition: box-shadow 0.21s;
+        margin-bottom: 2em;
+    }
+    .stTextInput>div>div>input:focus {
+        border-color: #f76767;
+        box-shadow: 0 2px 16px 0 #fd65b1bb;
     }
     </style>
 """, unsafe_allow_html=True)
