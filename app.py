@@ -14,119 +14,106 @@ st.set_page_config(
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    /* Gemini-like neutral, bright background */
+    /* Main App Background - blue-green gradient */
     .stApp {
-      background: #f9f9fd !important;
+      background: linear-gradient(120deg, #cbf6e8 0%, #548ad1 100%);
       min-height: 100vh;
+      font-family: 'Montserrat', 'Caveat', 'Segoe Script', Arial, sans-serif !important;
     }
 
-    /* Logo: simple, clean, hint of Gemini blue/purple gradient */
+    /* Elegant Logo Placement */
     .logo {
-      font-size: 2.15em;
-      font-weight: 800;
-      letter-spacing: -.5px;
-      margin-bottom: .52em;
-      color: #222;
-      background: linear-gradient(90deg,#80aaff 30%,#ad8aff 70%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
+      text-align: center;
+      padding-bottom: 0.8em;
     }
+
+    /* Stylish Title Font & Color */
     h1 {
       text-align: center;
-      font-size: 1.62em;
-      font-weight: 760;
-      margin-bottom: .7em;
-      color: #1a1745;
+      font-size: 2em;
+      font-family: 'Caveat', 'Segoe Script', Arial, sans-serif !important;
+      color: #23282b;
+      font-weight: 700;
+      margin-bottom: .2em;
     }
 
-    header, footer {visibility: hidden; height: 0 !important;}
-
-    /* Main content centered, with extra white space */
-    .main .block-container {
-      padding-top: 2.2rem;
-      padding-bottom: 4rem;
-      max-width: 600px;
-      margin: 0 auto;
-      box-sizing: border-box;
-    }
-
-    /* Chat bubbles: sleek, Gemini-inspired, pill shape, shadow, soft divides */
-    .chat-bubble {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 18px 24px;
-      border-radius: 22px;
-      margin-bottom: 16px;
-      font-size: 1.06em;
-      background: #fff;
-      color: #1a1745;
-      box-shadow: 0 2.5px 17px 0 #a58fff10, 0 0.7px 5px 0 #c0d4f942;
-      border: none;
-      white-space: pre-line;
-      font-family: 'Inter', system-ui, Arial, sans-serif;
-    }
-    .user-bubble {
-      background: linear-gradient(95deg, #e8edfa 60%, #f7f5ff 100%);
-      color: #4527A0;
-      margin-left: auto;
-      border-radius: 26px 18px 22px 26px;
-      border: 0.5px solid #d7dbfd68;
-      box-shadow: 0 2px 14px #ad8aff22;
-      text-align: right;
-    }
-    .assistant-bubble {
-      background: linear-gradient(92deg,#f6f6fe 61%,#e8f3ff 100%);
-      color: #1a1745;
-      margin-right: auto;
-      border-radius: 18px 26px 26px 22px;
-      border: 0.5px solid #d7dbfd1f;
-      box-shadow: 0 2px 14px #80aaff22;
-    }
-
-    /* Buttons: smooth, flat, blueish highlight on hover, Gemini-ish */
+    /* Suggestion Buttons - subtle pastel, pop on hover */
     .stButton>button {
-      background: #fff;
-      color: #5a43d6;
+      background: #f6fffd;
+      color: #386296;
       border-radius: 19px;
-      border: 1.3px solid #d7dbfd;
-      font-size: 1.02em;
-      font-weight: 600;
-      padding: 0.6em 1.2em;
-      margin-bottom: 0.9em;
-      box-shadow: 0 1px 6px #f6f6fe31;
-      transition: border 0.12s, background 0.12s, color 0.12s;
+      border: 1.5px solid #b6e2ef;
+      font-size: 1em;
+      font-weight: 500;
+      padding: 0.58em 1.3em;
+      margin-bottom: 0.7em;
+      box-shadow: 0 1px 4px #548ad130;
+      transition: .14s;
     }
     .stButton>button:hover {
-      background: linear-gradient(95deg,#eceeff 80%,#e0fafb 100%);
-      color: #342993;
-      border: 1.3px solid #80aaff;
+      background: linear-gradient(92deg,#c7edfa 0%,#e6fffa 100%);
+      color: #23282b;
+      border: 1.5px solid #88cdee;
     }
 
-    /* Text input: flat, border, highlight blue on focus, Gemini-style */
+    /* Chat Bubbles - Clean, Fashionable */
+    .chat-bubble {
+      width: 70%;
+      box-sizing: border-box;
+      padding: 17px 23px;
+      border-radius: 22px;
+      margin-bottom: 13px;
+      font-size: 1.07em;
+      background: #fafdfe;
+      color: #23282b;
+      box-shadow: 0 2px 14px #b1e3f714;
+      border: none;
+      white-space: pre-line;
+      font-family: 'Montserrat', 'Arial Rounded MT Bold', Arial, sans-serif !important;
+    }
+    .user-bubble {
+      background: linear-gradient(93deg, #daf5fd 67%, #fafffa 100%);
+      color: #438798;
+      border-radius: 26px 18px 22px 26px;
+      border: 0.5px solid #bbf4f441;
+      text-align: right;
+      font-family: inherit;
+    }
+    .assistant-bubble {
+      background: linear-gradient(99deg,#edfcfb 54%,#f1f5ff 100%);
+      color: #23282b;
+      border-radius: 18px 26px 26px 22px;
+      border: 0.5px solid #badaee19;
+    }
+
+    /* Text Input - Clean, with color accent on focus */
     .stTextInput>div>div>input {
       background: #fff;
       border-radius: 12px;
-      border: 1.7px solid #d7dbfd;
-      font-size: 1.08em;
-      color: #2d2a59;
+      border: 1.7px solid #b6e2ef;
+      font-size: 1.09em;
+      color: #314468;
       font-weight: 500;
-      box-shadow: 0 1.5px 9px #ad8aff1a;
-      padding: 15px 15px !important;
-      margin-bottom: 1.35em;
-      transition: border 0.13s;
+      box-shadow: 0 1.5px 7px #8adbff17;
+      padding: 14px 15px !important;
+      margin-bottom: 1.27em;
+      transition: border 0.12s;
+      font-family: 'Montserrat', Arial, sans-serif !important;
     }
     .stTextInput>div>div>input:focus {
-      border: 2px solid #6e6eea !important;
+      border: 2px solid #5ececf !important;
       outline: none;
-      background: #f4faff;
+      background: #e4fafd;
     }
+
+    /* Hide Streamlit header/footer */
+    header, footer {visibility: hidden; height: 0 !important;}
     </style>
 """, unsafe_allow_html=True)
 
 
 # --- UI Layout ---
-st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
+st.image("WhatsApp-Image-2025-07-29-at-12.03.57-PM.jpg", use_column_width=True)
 st.title("Ask our Fashion AI anything")
 st.write("Suggestions on what to ask Our AI")
 
