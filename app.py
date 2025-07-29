@@ -5,7 +5,7 @@ import json
 
 cols = st.columns([1, 3])
 with cols[0]:
-    st.image("https://github.com/pranay0923/fashion-chatbot-frontend/blob/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg", use_container_width=True)
+    st.image(""https://raw.githubusercontent.com/pranay0923/fashion-chatbot-frontend/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg"", use_container_width=True)
 
 
 # --- CSS for the Look and Feel ---
@@ -103,7 +103,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- UI Layout ---
-st.image("https://github.com/pranay0923/fashion-chatbot-frontend/blob/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg", use_column_width=True)
+st.image(""https://raw.githubusercontent.com/pranay0923/fashion-chatbot-frontend/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg"", use_column_width=True)
 
 st.title("Ask our Fashion AI anything")
 st.write("Suggestions on what to ask Our AI")
