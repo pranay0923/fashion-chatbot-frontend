@@ -146,6 +146,26 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    /* Re-apply gradient to modal/spinner overlays and base body */
+    body, .stApp, .css-1gk0v0z, .block-container, .stSpinner, .stModal {
+      background: linear-gradient(120deg, #e0f2f1 0%, #a7c7e7 100%) !important;
+      transition: none !important;
+    }
+    /* Make Streamlit's "Thinking..." overlay transparent and non-blocking */
+    .stSpinner, .stSpinner>div {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    /* App loading area */
+    .st-emotion-cache-17eq0hr, .st-emotion-cache-0 {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 
 
 # --- UI Layout ---
