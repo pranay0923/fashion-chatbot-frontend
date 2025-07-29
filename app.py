@@ -58,7 +58,7 @@ st.markdown("""
 
     /* Chat Bubbles: clean, feminine, airy feel */
     .chat-bubble {
-      width: 100%;
+      width: 70%;
       box-sizing: border-box;
       padding: 17px 23px;
       border-radius: 29px;
