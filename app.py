@@ -14,158 +14,88 @@ st.set_page_config(
 # --- CSS Styling ---
 st.markdown("""
     <style>
-    /* App Background */
     .stApp {
-      background: linear-gradient(120deg, #e0f2f1 0%, #a7c7e7 100%);
+      background: linear-gradient(120deg, #e5f7fc 0%, #bccbea 100%);
       min-height: 100vh;
-      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
     }
-
-    /* Container Padding */
     .block-container {
-      padding-top: 2.5rem !important;
-      max-width: 680px;
-      margin-left: auto;
-      margin-right: auto;
+      padding-top: 2rem !important;
     }
-
-    /* Header Columns Spacing */
-    .css-1r6slb0 {
-      margin-bottom: 2.8rem !important;
-    }
-
-    /* Title Styling */
     h1 {
-      margin: 0;
-      padding-left: 1rem;
+      text-align: center;
+      font-size: 2em;
       font-weight: 700;
-      font-size: 2.3rem;
-      color: #10475e; 
-      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      height: 100%;
+      color: #182b40;
+      font-family: 'Nunito', Arial, sans-serif !important;
+      margin-bottom: .7em;
     }
-
-    /* Suggestion Buttons */
     .stButton>button {
-      background: #ffffffcc;
-      color: #136a8a;
-      border-radius: 24px;
-      border: 1.7px solid #64a6c2;
-      padding: 0.6em 1.6em;
-      font-weight: 600;
-      font-size: 1.05em;
-      margin-bottom: 1.1em;
-      box-shadow: 0 4px 12px #90c9de88;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-      cursor: pointer;
-      user-select: none;
+      background: #fff;
+      color: #224b7b;
+      border-radius: 20px;
+      border: 1.5px solid #b9d6f2;
+      font-size: 1em;
+      font-weight: 500;
+      padding: 0.55em 1.53em;
+      margin-bottom: 1em;
+      box-shadow: 0 2px 10px #89b7ef18;
+      transition: .13s;
     }
     .stButton>button:hover {
-      background: linear-gradient(90deg, #78aadd 15%, #a2caf8 85%);
-      color: #0e3c50;
-      border-color: #3f8cba;
-      box-shadow: 0 6px 18px #3f8cba99;
-      transform: translateY(-2px);
+      background: linear-gradient(90deg, #e4eefc 60%, #faffff 100%);
+      color: #165083;
+      border: 1.5px solid #6bb3e6;
     }
-
-    /* Chat Bubbles General */
     .chat-bubble {
       width: 100%;
       box-sizing: border-box;
-      padding: 18px 26px;
-      margin-bottom: 18px;
-      font-size: 1.1em;
-      white-space: pre-wrap;
-      border-radius: 28px;
-      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
-      box-shadow: 0 3px 14px rgba(62, 131, 177, 0.1);
+      padding: 16px 23px;
+      border-radius: 18px;
+      margin-bottom: 14px;
+      font-size: 1.07em;
+      background: #fafdfe;
+      color: #23282b;
+      box-shadow: 0 2px 12px #b1e3f712;
       border: none;
-      max-width: 85vw;
+      white-space: pre-line;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif !important;
     }
-
-    /* User Bubble (Right) */
     .user-bubble {
-      background: linear-gradient(120deg, #b2e0e3 30%, #d6f0f1 100%);
-      color: #0f4c5c;
-      margin-left: auto;
-      border-radius: 28px 18px 18px 28px;
-      border: 1.3px solid #88c4c7aa;
-      box-shadow: 0 3px 20px #88c4c799;
+      background: linear-gradient(94deg, #dbf3f9 61%, #fafdff 100%);
+      color: #276685;
+      border-radius: 24px 16px 18px 24px;
+      border: 1px solid #cdf2fb31;
       text-align: right;
+      font-family: inherit;
     }
-
-    /* Assistant Bubble (Left) */
     .assistant-bubble {
-      background: linear-gradient(120deg, #f0f4f9 65%, #daecfb 95%);
-      color: #1f3c55;
-      margin-right: auto;
-      border-radius: 18px 28px 28px 18px;
-      border: 1.3px solid #b6d5f0aa;
-      box-shadow: 0 2px 15px #b6d5f099;
-      text-align: left;
+      background: linear-gradient(99deg,#f6fcfb 54%,#edeffb 100%);
+      color: #233649;
+      border-radius: 16px 24px 24px 18px;
+      border: 1px solid #d3eafe18;
     }
-
-    /* Chat Input */
     .stTextInput>div>div>input {
       background: #fff;
-      border-radius: 14px;
-      border: 1.8px solid #7eb6ce;
-      font-size: 1.12em;
-      color: #19526f;
-      font-weight: 600;
-      box-shadow: 0 2px 12px #94bad7aa;
-      padding: 16px 18px !important;
-      margin-bottom: 1.5em;
-      transition: border-color 0.15s ease;
-      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
+      border-radius: 12px;
+      border: 1.6px solid #b6dafe;
+      font-size: 1.09em;
+      color: #27405a;
+      font-weight: 500;
+      box-shadow: 0 1.5px 7px #bcdff817;
+      padding: 13px 15px !important;
+      margin-bottom: 1.35em;
+      transition: border 0.13s;
+      font-family: 'Nunito', Arial, sans-serif !important;
     }
     .stTextInput>div>div>input:focus {
-      border-color: #074f5f !important;
+      border: 2px solid #4682bf !important;
       outline: none;
-      background: #e8f5f8;
+      background: #e5f3fa;
     }
-
-    /* Hide Streamlit default header and footer */
-    header, footer {
-      visibility: hidden;
-      height: 0 !important;
-    }
-
-    /* Responsive adjustments for mobile smaller widths */
-    @media (max-width: 480px) {
-      .stButton>button {
-        font-size: 0.94em;
-        padding: 0.5em 1.2em;
-      }
-      h1 {
-        font-size: 1.8rem;
-        padding-left: 0.5rem;
-      }
-    }
+    header, footer {visibility: hidden; height: 0 !important;}
     </style>
 """, unsafe_allow_html=True)
-st.markdown("""
-    <style>
-    /* Re-apply gradient to modal/spinner overlays and base body */
-    body, .stApp, .css-1gk0v0z, .block-container, .stSpinner, .stModal {
-      background: linear-gradient(120deg, #e0f2f1 0%, #a7c7e7 100%) !important;
-      transition: none !important;
-    }
-    /* Make Streamlit's "Thinking..." overlay transparent and non-blocking */
-    .stSpinner, .stSpinner>div {
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    /* App loading area */
-    .st-emotion-cache-17eq0hr, .st-emotion-cache-0 {
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
 
 
 # --- UI Layout ---
@@ -180,7 +110,7 @@ with cols[0]:
     )
 with cols[1]:
     st.markdown(
-        "<h1>Style Pat Fashion AI</h1>",
+        "<h1>Ask our Fashion AI Anything </h1>",
         unsafe_allow_html=True,
     )
 
