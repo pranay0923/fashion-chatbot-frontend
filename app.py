@@ -8,7 +8,6 @@ st.set_page_config(
     page_title="Fashion Chatbot",
     page_icon="https://raw.githubusercontent.com/pranay0923/fashion-chatbot-frontend/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg",
     layout="wide"
-    initial_sidebar_state="collapsed"
 )
 
 # --- CSS for the Look and Feel ---
