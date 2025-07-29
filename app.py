@@ -14,136 +14,113 @@ st.set_page_config(
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    /* ===== Animated, Trendy Pastel Gradient Background ===== */
-    @keyframes moveBG {
-      0% {background-position:0% 50%}
-      50% {background-position:100% 50%}
-      100% {background-position:0% 50%}
-    }
+    /* Main background: clean, neutral */
     .stApp {
-      background: linear-gradient(120deg, #fceabb 0%, #f8bfae 40%, #d8dcff 100%);
-      background-size: 200% 200%;
-      animation: moveBG 11s ease-in-out infinite;
+      background: #f3f4f6 !important;
       min-height: 100vh;
     }
 
-    /* ===== Shimmering Logo ===== */
+    /* Logo and title: keep low-key and clean */
     .logo {
-      font-size: 2.9em;
-      margin-bottom: 0.45em;
-      background-image: linear-gradient(90deg, #ffb8b2, #fea, #5ee7df, #b490ca);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      animation: shimmer 2.5s infinite alternate;
-      font-weight: 800;
-      letter-spacing: 0.04em;
+      font-size: 2.1em;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+      letter-spacing: -0.5px;
+      color: #333;
+      background: none;
+      text-shadow: none;
     }
-    @keyframes shimmer {
-      to {
-        background-position: 160% center;
-      }
-    }
-
-    /* ===== Trendy Gradient Title ===== */
     h1 {
       text-align: center;
-      font-size: 2.2em;
-      font-weight: 900;
-      padding-bottom: .1em;  
-      background: linear-gradient(87deg, #1c1c74 27%, #ef474a 55%, #fdc466 80%);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      letter-spacing: 1.5px;
-      animation: shimmer 5s infinite alternate;
-      margin-bottom: 0.7em;
+      font-size: 1.65em;
+      font-weight: 750;
+      background: none;
+      color: #222;
+      letter-spacing: .03em;
+      margin-bottom: 0.65em;
     }
 
-    /* ===== Hide Streamlit header/footer ===== */
-    header, footer {visibility: hidden; height:0 !important;}
+    /* Hide Streamlit's header/footer */
+    header, footer {visibility: hidden; height: 0 !important;}
 
-    /* ===== Vibrant Suggestion Buttons ===== */
-    .stButton>button {
-      background: linear-gradient(90deg, #fff7e4, #d8dcff);
-      color: #1c1c74;
-      border: none;
-      border-radius: 20px;
-      padding: 0.7em 1.6em;
-      font-size: 1.13em;
-      font-weight: bold;
-      box-shadow: 0 3px 16px #ceabff35, 0 0px 0px #ef62b710;
-      margin-bottom: 1.05em;
-      transition: 0.16s;
-      cursor:pointer;
-      outline: none;
-    }
-    .stButton>button:hover {
-      color: #fff;
-      background: linear-gradient(100deg,#b490ca 10%, #ef474a 90%);
-      box-shadow: 0 4px 19px 2px #f8bfae91;
-      transform: scale(1.04) translateY(-2px);
-    }
-
-    /* ===== Chat message bubbles, user/assistant distinction ===== */
-    .chat-bubble {
-      padding: 14px 21px;
-      border-radius: 1.6em 2.2em 2em 2em;
-      max-width: 75vw;
-      font-size: 1.12em;
-      margin-bottom: 14px;
-      word-break: break-word;
-      box-shadow: 0 6px 24px 0 #b490ca19,
-        0 1.5px 10px 0 #d8dcff1a;
-      border: 1px solid #e0dced4d;
-    }
-    .user-bubble {
-      background: linear-gradient(120deg,#b6fbff 30%, #f1fcfb 100%);
-      color: #184757;
-      margin-left: auto;
-      border-radius: 2.3em 1.2em 2em 2em;
-      border: 1.5px solid #b6fbff6b;
-      box-shadow: 0 0 12px #d8dcff33;
-      text-align: right;
-    }
-    .assistant-bubble {
-      background: linear-gradient(105deg,#fcb1b1 10%, #f9f7d7 80%);
-      color: #2c225a;
-      margin-right: auto;
-      border-radius: 1.3em 2.3em 2em 2em;
-      border: 1.5px solid #fcb1b141;
-      box-shadow: 0 0 12px #ffb7b72c;
-    }
-
-    /* ===== Centralized, Responsive, Neat Layout ===== */
+    /* Central, narrow layout like ChatGPT */
     .main .block-container {
-      padding-top: 4rem;
+      padding-top: 2.5rem;
       padding-bottom: 4.5rem;
-      align-items: center;
-      max-width: 670px;
+      max-width: 590px;
       margin: 0 auto;
     }
 
-    /* ===== Styled Text Input Box ===== */
-    .stTextInput>div>div>input {
-      background: linear-gradient(90deg, #fff 64%, #f8bfae1a 100%);
-      color: #2c225a;
-      border-radius: 11px;
-      border: 2.1px solid #e0dced;
-      font-size: 1.18em;
+    /* Chat bubbles: rectangular, subtle rounded corners, box shadow, full width */
+    .chat-bubble {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 19px 20px;
+      border-radius: 8px;
+      font-size: 1.035em;
+      margin-bottom: 15px;
+      background: #fff;
+      color: #171717;
+      box-shadow: 0 1.5px 10px 0 #e2e8f033;
+      border: 1px solid #ececec;
+      text-align: left;
+      white-space: pre-line;
+      font-family: 'Inter', system-ui, Arial, sans-serif;
+      transition: background 0.13s;
+    }
+    .user-bubble {
+      background: #f5fafd;
+      border: 1px solid #dde6ed;
+      color: #1b3966;
+      margin-left: auto;
+      box-shadow: 0 1px 6px #e2e8f0a0;
+    }
+    .assistant-bubble {
+      background: #fff;
+      border: 1px solid #eeeeee;
+      color: #131417;
+      margin-right: auto;
+      box-shadow: 0 1px 6px #e2e8f03a;
+    }
+
+    /* Suggestion buttons: simple, soft and ChatGPT-like */
+    .stButton>button {
+      background: #fff;
+      color: #444;
+      border-radius: 7px;
+      border: 1.5px solid #e6e6e6;
+      padding: 0.55em 1em;
+      font-size: 1.01em;
       font-weight: 500;
-      box-shadow: 0 3px 14px #b490ca3f;
-      padding: 13px 15px !important;
-      margin-bottom: 1.85em;
-      transition: border 0.14s, box-shadow 0.18s;
+      transition: 0.12s;
+      margin-bottom: 0.8em;
+      box-shadow: 0 1px 4px #d7dbe6a6;
+    }
+    .stButton>button:hover {
+      background: #e7eaf3;
+      color: #171717;
+      border: 1.5px solid #bec7da;
+    }
+
+    /* Text input: flat, clear border like ChatGPT */
+    .stTextInput>div>div>input {
+      background: #fff;
+      border-radius: 7px;
+      border: 1.5px solid #dddee0;
+      font-size: 1.08em;
+      font-weight: 400;
+      color: #1b3966;
+      box-shadow: 0 1.5px 6px #e2e8f033;
+      padding: 14px 12px !important;
+      margin-bottom: 1.5em;
+      transition: border 0.14s;
     }
     .stTextInput>div>div>input:focus {
-      border-color: #b490ca;
-      box-shadow: 0 2px 14px 0 #a0e6fc77, 0 0 7px #ef474a23;
+      border: 2px solid #1b3966 !important;
+      outline: none;
     }
     </style>
 """, unsafe_allow_html=True)
-
 
 
 # --- UI Layout ---
