@@ -76,7 +76,7 @@ st.markdown("""
       color: #197177;
       border-radius: 29px 19px 22px 29px;
       border: 1px solid #cdf2fb31;
-      text-align: right;
+      text-align: left;
       font-family: inherit;
     }
     .assistant-bubble {
