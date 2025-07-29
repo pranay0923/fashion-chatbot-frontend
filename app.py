@@ -94,9 +94,8 @@ st.markdown("""
 # --- UI Layout ---
 st.image(
     "https://raw.githubusercontent.com/pranay0923/fashion-chatbot-frontend/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg",
-    width=400  # 👈 Optional: sets a fixed width
+    width=40  # 👈 Optional: sets a fixed width
 )
-st.title("Ask our Fashion AI anything")
 st.title("Ask our Fashion AI anything")
 st.write("Suggestions on what to ask Our AI")
 
