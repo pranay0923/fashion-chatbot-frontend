@@ -113,7 +113,6 @@ st.markdown("""
 
 
 # --- UI Layout ---
-st.image("WhatsApp-Image-2025-07-29-at-12.03.57-PM.jpg", use_column_width=True)
 st.title("Ask our Fashion AI anything")
 st.write("Suggestions on what to ask Our AI")
 
