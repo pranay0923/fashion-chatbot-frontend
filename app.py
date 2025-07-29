@@ -3,13 +3,14 @@ import streamlit as st
 import requests
 import json
 
-# --- Page Configuration ---
 st.set_page_config(
-    page_title="Fashion AI",
-    page_icon="✨",
+    page_title="Style Pat Fashion AI",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# Show your logo at top
+st.image("WhatsApp-Image-2025-07-29-at-12.03.57-PM.jpg", use_container_width=True)
 
 # --- CSS for the Look and Feel ---
 st.markdown("""
