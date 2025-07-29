@@ -3,69 +3,62 @@ import streamlit as st
 import requests
 import json
 
-cols = st.columns([1, 3])
-with cols[0]:
-    st.image(""https://raw.githubusercontent.com/pranay0923/fashion-chatbot-frontend/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg"", use_container_width=True)
 
 
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    /* Soft blue-green gradient for app background */
     .stApp {
-      background: linear-gradient(120deg, #e4faf8 0%, #cbe4ff 100%);
+      background: linear-gradient(120deg, #e5f7fc 0%, #bccbea 100%);
       min-height: 100vh;
-      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
     }
-
-    /* Extra margin for logo-title header row */
     .block-container {
-      padding-top: 1.2rem !important;
+      padding-top: 2rem !important;
     }
-    .css-1r6slb0, .stColumns {
-      margin-bottom: 2.3rem !important;
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      font-weight: 700;
+      color: #182b40;
+      font-family: 'Nunito', Arial, sans-serif !important;
+      margin-bottom: .7em;
     }
-
-    /* Title h1 inside column (already styled in st.markdown inline) */
-
-    /* Suggestion Buttons: fresh, light, rounded, blue edge */
     .stButton>button {
       background: #fff;
-      color: #24628a;
-      border-radius: 22px;
-      border: 1.5px solid #a7e7f6;
+      color: #224b7b;
+      border-radius: 20px;
+      border: 1.5px solid #b9d6f2;
       font-size: 1em;
       font-weight: 500;
-      padding: 0.60em 1.6em;
+      padding: 0.55em 1.53em;
       margin-bottom: 1em;
-      box-shadow: 0 2px 10px #aaeef727;
-      transition: .14s;
+      box-shadow: 0 2px 10px #89b7ef18;
+      transition: .13s;
     }
     .stButton>button:hover {
-      background: linear-gradient(90deg,#e6fafd 60%,#e5f2ff 100%);
-      color: #154162;
-      border: 1.5px solid #63b5e2;
+      background: linear-gradient(90deg, #e4eefc 60%, #faffff 100%);
+      color: #165083;
+      border: 1.5px solid #6bb3e6;
     }
-
-    /* Chat Bubbles: gentle, clean */
     .chat-bubble {
       width: 100%;
       box-sizing: border-box;
       padding: 16px 23px;
-      border-radius: 26px;
-      margin-bottom: 12px;
+      border-radius: 18px;
+      margin-bottom: 14px;
       font-size: 1.07em;
       background: #fafdfe;
-      color: #223040;
-      box-shadow: 0 2px 10px #b1e3f712;
+      color: #23282b;
+      box-shadow: 0 2px 12px #b1e3f712;
       border: none;
       white-space: pre-line;
-      font-family: 'Montserrat', Arial, sans-serif !important;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif !important;
     }
     .user-bubble {
       background: linear-gradient(94deg, #dbf3f9 61%, #fafdff 100%);
-      color: #197177;
-      border-radius: 26px 18px 22px 26px;
+      color: #276685;
+      border-radius: 24px 16px 18px 24px;
       border: 1px solid #cdf2fb31;
       text-align: right;
       font-family: inherit;
@@ -73,31 +66,27 @@ st.markdown("""
     .assistant-bubble {
       background: linear-gradient(99deg,#f6fcfb 54%,#edeffb 100%);
       color: #233649;
-      border-radius: 18px 26px 26px 22px;
+      border-radius: 16px 24px 24px 18px;
       border: 1px solid #d3eafe18;
     }
-
-    /* Text input: subtle, bold blue border on focus */
     .stTextInput>div>div>input {
       background: #fff;
       border-radius: 12px;
-      border: 1.5px solid #b6e2ef;
+      border: 1.6px solid #b6dafe;
       font-size: 1.09em;
-      color: #20364a;
+      color: #27405a;
       font-weight: 500;
-      box-shadow: 0 1.5px 7px #74c7e417;
-      padding: 14px 15px !important;
+      box-shadow: 0 1.5px 7px #bcdff817;
+      padding: 13px 15px !important;
       margin-bottom: 1.35em;
-      transition: border 0.11s;
-      font-family: 'Montserrat', Arial, sans-serif !important;
+      transition: border 0.13s;
+      font-family: 'Nunito', Arial, sans-serif !important;
     }
     .stTextInput>div>div>input:focus {
-      border: 2px solid #63b5e2 !important;
+      border: 2px solid #4682bf !important;
       outline: none;
-      background: #e7fafd;
+      background: #e5f3fa;
     }
-
-    /* Hide Streamlit header/footer for clean look */
     header, footer {visibility: hidden; height: 0 !important;}
     </style>
 """, unsafe_allow_html=True)
