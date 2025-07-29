@@ -14,113 +14,116 @@ st.set_page_config(
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    /* Main background: clean, neutral */
+    /* Gemini-like neutral, bright background */
     .stApp {
-      background: #f3f4f6 !important;
+      background: #f9f9fd !important;
       min-height: 100vh;
     }
 
-    /* Logo and title: keep low-key and clean */
+    /* Logo: simple, clean, hint of Gemini blue/purple gradient */
     .logo {
-      font-size: 2.1em;
-      font-weight: 700;
-      margin-bottom: 0.5em;
-      letter-spacing: -0.5px;
-      color: #333;
-      background: none;
-      text-shadow: none;
+      font-size: 2.15em;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      margin-bottom: .52em;
+      color: #222;
+      background: linear-gradient(90deg,#80aaff 30%,#ad8aff 70%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
     }
     h1 {
       text-align: center;
-      font-size: 1.65em;
-      font-weight: 750;
-      background: none;
-      color: #222;
-      letter-spacing: .03em;
-      margin-bottom: 0.65em;
+      font-size: 1.62em;
+      font-weight: 760;
+      margin-bottom: .7em;
+      color: #1a1745;
     }
 
-    /* Hide Streamlit's header/footer */
     header, footer {visibility: hidden; height: 0 !important;}
 
-    /* Central, narrow layout like ChatGPT */
+    /* Main content centered, with extra white space */
     .main .block-container {
-      padding-top: 2.5rem;
-      padding-bottom: 4.5rem;
-      max-width: 590px;
+      padding-top: 2.2rem;
+      padding-bottom: 4rem;
+      max-width: 600px;
       margin: 0 auto;
+      box-sizing: border-box;
     }
 
-    /* Chat bubbles: rectangular, subtle rounded corners, box shadow, full width */
+    /* Chat bubbles: sleek, Gemini-inspired, pill shape, shadow, soft divides */
     .chat-bubble {
       width: 100%;
       box-sizing: border-box;
-      padding: 19px 20px;
-      border-radius: 8px;
-      font-size: 1.035em;
-      margin-bottom: 15px;
+      padding: 18px 24px;
+      border-radius: 22px;
+      margin-bottom: 16px;
+      font-size: 1.06em;
       background: #fff;
-      color: #171717;
-      box-shadow: 0 1.5px 10px 0 #e2e8f033;
-      border: 1px solid #ececec;
-      text-align: left;
+      color: #1a1745;
+      box-shadow: 0 2.5px 17px 0 #a58fff10, 0 0.7px 5px 0 #c0d4f942;
+      border: none;
       white-space: pre-line;
       font-family: 'Inter', system-ui, Arial, sans-serif;
-      transition: background 0.13s;
     }
     .user-bubble {
-      background: #f5fafd;
-      border: 1px solid #dde6ed;
-      color: #1b3966;
+      background: linear-gradient(95deg, #e8edfa 60%, #f7f5ff 100%);
+      color: #4527A0;
       margin-left: auto;
-      box-shadow: 0 1px 6px #e2e8f0a0;
+      border-radius: 26px 18px 22px 26px;
+      border: 0.5px solid #d7dbfd68;
+      box-shadow: 0 2px 14px #ad8aff22;
+      text-align: right;
     }
     .assistant-bubble {
-      background: #fff;
-      border: 1px solid #eeeeee;
-      color: #131417;
+      background: linear-gradient(92deg,#f6f6fe 61%,#e8f3ff 100%);
+      color: #1a1745;
       margin-right: auto;
-      box-shadow: 0 1px 6px #e2e8f03a;
+      border-radius: 18px 26px 26px 22px;
+      border: 0.5px solid #d7dbfd1f;
+      box-shadow: 0 2px 14px #80aaff22;
     }
 
-    /* Suggestion buttons: simple, soft and ChatGPT-like */
+    /* Buttons: smooth, flat, blueish highlight on hover, Gemini-ish */
     .stButton>button {
       background: #fff;
-      color: #444;
-      border-radius: 7px;
-      border: 1.5px solid #e6e6e6;
-      padding: 0.55em 1em;
-      font-size: 1.01em;
-      font-weight: 500;
-      transition: 0.12s;
-      margin-bottom: 0.8em;
-      box-shadow: 0 1px 4px #d7dbe6a6;
+      color: #5a43d6;
+      border-radius: 19px;
+      border: 1.3px solid #d7dbfd;
+      font-size: 1.02em;
+      font-weight: 600;
+      padding: 0.6em 1.2em;
+      margin-bottom: 0.9em;
+      box-shadow: 0 1px 6px #f6f6fe31;
+      transition: border 0.12s, background 0.12s, color 0.12s;
     }
     .stButton>button:hover {
-      background: #e7eaf3;
-      color: #171717;
-      border: 1.5px solid #bec7da;
+      background: linear-gradient(95deg,#eceeff 80%,#e0fafb 100%);
+      color: #342993;
+      border: 1.3px solid #80aaff;
     }
 
-    /* Text input: flat, clear border like ChatGPT */
+    /* Text input: flat, border, highlight blue on focus, Gemini-style */
     .stTextInput>div>div>input {
       background: #fff;
-      border-radius: 7px;
-      border: 1.5px solid #dddee0;
+      border-radius: 12px;
+      border: 1.7px solid #d7dbfd;
       font-size: 1.08em;
-      font-weight: 400;
-      color: #1b3966;
-      box-shadow: 0 1.5px 6px #e2e8f033;
-      padding: 14px 12px !important;
-      margin-bottom: 1.5em;
-      transition: border 0.14s;
+      color: #2d2a59;
+      font-weight: 500;
+      box-shadow: 0 1.5px 9px #ad8aff1a;
+      padding: 15px 15px !important;
+      margin-bottom: 1.35em;
+      transition: border 0.13s;
     }
     .stTextInput>div>div>input:focus {
-      border: 2px solid #1b3966 !important;
+      border: 2px solid #6e6eea !important;
       outline: none;
+      background: #f4faff;
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 # --- UI Layout ---
