@@ -14,125 +14,136 @@ st.set_page_config(
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    /* Animated vibrant background */
-    @keyframes gradientMove {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
+    /* ===== Animated, Trendy Pastel Gradient Background ===== */
+    @keyframes moveBG {
+      0% {background-position:0% 50%}
+      50% {background-position:100% 50%}
+      100% {background-position:0% 50%}
     }
     .stApp {
-        background: linear-gradient(135deg, #f9f5ff, #fceabb, #f8bfae, #b9deed);
-        background-size: 400% 400%;
-        animation: gradientMove 12s ease-in-out infinite;
-        min-height: 100vh;
+      background: linear-gradient(120deg, #fceabb 0%, #f8bfae 40%, #d8dcff 100%);
+      background-size: 200% 200%;
+      animation: moveBG 11s ease-in-out infinite;
+      min-height: 100vh;
     }
-    /* Logo – animate a shine */
+
+    /* ===== Shimmering Logo ===== */
     .logo {
-        font-size: 2.7em;
-        margin-bottom: 0.5em;
-        background: linear-gradient(90deg, #f76767, #ffb347 50%, #fffa8b 80%, #a0e6fc);
-        background-size: 200%;
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-        animation: shine 2s linear infinite alternate;
+      font-size: 2.9em;
+      margin-bottom: 0.45em;
+      background-image: linear-gradient(90deg, #ffb8b2, #fea, #5ee7df, #b490ca);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: shimmer 2.5s infinite alternate;
+      font-weight: 800;
+      letter-spacing: 0.04em;
     }
-    @keyframes shine {
-        from {
-            background-position: left;
-        }
-        to {
-            background-position: right;
-        }
+    @keyframes shimmer {
+      to {
+        background-position: 160% center;
+      }
     }
-    /* Fancy title */
+
+    /* ===== Trendy Gradient Title ===== */
     h1 {
-        text-align: center;
-        font-size: 2.4em;
-        background: linear-gradient(90deg,#4233d4,#CB2D3e,#ef473a,#F7971E);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        color: transparent;
-        animation: shine 3s alternate infinite;
-        letter-spacing: 1px;
-        margin-bottom: 0.6em;
-        font-weight: 900;
+      text-align: center;
+      font-size: 2.2em;
+      font-weight: 900;
+      padding-bottom: .1em;  
+      background: linear-gradient(87deg, #1c1c74 27%, #ef474a 55%, #fdc466 80%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: 1.5px;
+      animation: shimmer 5s infinite alternate;
+      margin-bottom: 0.7em;
     }
-    /* Suggestion buttons: vibrant, glowing on hover */
+
+    /* ===== Hide Streamlit header/footer ===== */
+    header, footer {visibility: hidden; height:0 !important;}
+
+    /* ===== Vibrant Suggestion Buttons ===== */
     .stButton>button {
-        background: linear-gradient(90deg, #fff7e4, #ffe3e3 60%, #ffe6fa);
-        border: 2px solid #ecc3c3;
-        border-radius: 17px;
-        padding: 0.6em 1.3em;
-        color: #4233d4;
-        font-weight: 600;
-        font-size: 1.12em;
-        margin-bottom: 1.2em;
-        box-shadow: 0 2px 7px 0 rgba(249,108,158,.13), 0 0 0 0 #ef62b7;
-        transition: all 0.25s;
+      background: linear-gradient(90deg, #fff7e4, #d8dcff);
+      color: #1c1c74;
+      border: none;
+      border-radius: 20px;
+      padding: 0.7em 1.6em;
+      font-size: 1.13em;
+      font-weight: bold;
+      box-shadow: 0 3px 16px #ceabff35, 0 0px 0px #ef62b710;
+      margin-bottom: 1.05em;
+      transition: 0.16s;
+      cursor:pointer;
+      outline: none;
     }
     .stButton>button:hover {
-        transform: translateY(-2px) scale(1.04);
-        border-color: #f76767;
-        color: #fff;
-        background: linear-gradient(95deg, #F7971E 10%, #CB2D3e 90%);
-        box-shadow: 0 2px 14px 4px #ffbb55b7, 0 0 8px 2px #5236ec55;
+      color: #fff;
+      background: linear-gradient(100deg,#b490ca 10%, #ef474a 90%);
+      box-shadow: 0 4px 19px 2px #f8bfae91;
+      transform: scale(1.04) translateY(-2px);
     }
-    /* Hide Streamlit's header/footer */
-    header, footer { visibility: hidden; height:0 !important; }
-    /* Chat bubbles: card-like, modern, vibrant, drop shadow */
+
+    /* ===== Chat message bubbles, user/assistant distinction ===== */
     .chat-bubble {
-        padding: 15px 23px;
-        border-radius: 16px 24px 18px 16px;
-        margin-bottom: 12px;
-        max-width: 80vw;
-        display: inline-block;
-        font-size: 1.13em;
-        box-shadow: 0 5px 24px 1px rgba(85,85,185,0.04), 0 2px 8px 0 #f7676733;
-        border: 1px solid rgba(0,0,0,0.03);
+      padding: 14px 21px;
+      border-radius: 1.6em 2.2em 2em 2em;
+      max-width: 75vw;
+      font-size: 1.12em;
+      margin-bottom: 14px;
+      word-break: break-word;
+      box-shadow: 0 6px 24px 0 #b490ca19,
+        0 1.5px 10px 0 #d8dcff1a;
+      border: 1px solid #e0dced4d;
     }
     .user-bubble {
-        background: linear-gradient(140deg, #a0e6fc, #fffdc2, #fff 95%);
-        color: #4233d4;
-        text-align: right;
-        margin-left: auto;
-        box-shadow: 0 0 16px 2px #a0e6fc33;
-        border-top-right-radius: 35px;
+      background: linear-gradient(120deg,#b6fbff 30%, #f1fcfb 100%);
+      color: #184757;
+      margin-left: auto;
+      border-radius: 2.3em 1.2em 2em 2em;
+      border: 1.5px solid #b6fbff6b;
+      box-shadow: 0 0 12px #d8dcff33;
+      text-align: right;
     }
     .assistant-bubble {
-        background: linear-gradient(140deg,#ef62b7 18%, #cb2d3e05 48%, #fff9c6 94%);
-        color: #cb2d3e;
-        margin-right: auto;
-        box-shadow: 0 0 18px 2px #ef62b722;
-        border-top-left-radius: 32px;
+      background: linear-gradient(105deg,#fcb1b1 10%, #f9f7d7 80%);
+      color: #2c225a;
+      margin-right: auto;
+      border-radius: 1.3em 2.3em 2em 2em;
+      border: 1.5px solid #fcb1b141;
+      box-shadow: 0 0 12px #ffb7b72c;
     }
-    /* Chat container padding */
+
+    /* ===== Centralized, Responsive, Neat Layout ===== */
     .main .block-container {
-        padding-top: 4rem;
-        padding-bottom: 5rem;
-        align-items: center;
-        max-width: 650px;
-        margin: 0 auto;
+      padding-top: 4rem;
+      padding-bottom: 4.5rem;
+      align-items: center;
+      max-width: 670px;
+      margin: 0 auto;
     }
-    /* Text input: subtle style, big enough */
+
+    /* ===== Styled Text Input Box ===== */
     .stTextInput>div>div>input {
-        background: linear-gradient(90deg,#fff7e4 60%,#bad1ff1b 100%);
-        color: #CB2D3e;
-        border-radius: 10px;
-        border: 2px solid #efd8f7;
-        font-size: 1.17em;
-        font-weight: 500;
-        box-shadow: 0 3px 8px 0 #a0e6fc28;
-        padding: 14px 13px !important;
-        transition: box-shadow 0.21s;
-        margin-bottom: 2em;
+      background: linear-gradient(90deg, #fff 64%, #f8bfae1a 100%);
+      color: #2c225a;
+      border-radius: 11px;
+      border: 2.1px solid #e0dced;
+      font-size: 1.18em;
+      font-weight: 500;
+      box-shadow: 0 3px 14px #b490ca3f;
+      padding: 13px 15px !important;
+      margin-bottom: 1.85em;
+      transition: border 0.14s, box-shadow 0.18s;
     }
     .stTextInput>div>div>input:focus {
-        border-color: #f76767;
-        box-shadow: 0 2px 16px 0 #fd65b1bb;
+      border-color: #b490ca;
+      box-shadow: 0 2px 14px 0 #a0e6fc77, 0 0 7px #ef474a23;
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 # --- UI Layout ---
