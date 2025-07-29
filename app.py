@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 # Show your logo at top
-st.image("WhatsApp-Image-2025-07-29-at-12.03.57-PM.jpg", use_container_width=True)
+st.image("https://github.com/pranay0923/fashion-chatbot-frontend/blob/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg", use_container_width=True)
 
 # --- CSS for the Look and Feel ---
 st.markdown("""
