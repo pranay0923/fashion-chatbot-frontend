@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import base64
 
 # --- Streamlit page setup ---
 st.set_page_config(
@@ -65,64 +66,56 @@ if "pending_fill" not in st.session_state:
     st.session_state["pending_fill"] = ""
 
 # --- Backend Config ---
-API_URL = "https://fashion-chatbot-szzt.onrender.com/chat"
+API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
 # --- API Call Logic ---
 def call_backend_api(user_id, message, image_file=None):
     try:
-        data = {
+        image_base64 = None
+        if image_file:
+            image_bytes = image_file.read()
+            image_base64 = f"data:image/jpeg;base64,{base64.b64encode(image_bytes).decode('utf-8')}"
+
+        payload = {
             "user_id": user_id,
-            "message": message
+            "message": message,
+            "image_base64": image_base64
         }
 
-        if image_file:
-            files = {
-                "image": (image_file.name, image_file, image_file.type)
-            }
-            response = requests.post(API_URL, data=data, files=files)
-        else:
-            response = requests.post(API_URL, data=data)
-
+        response = requests.post(API_URL, json=payload)
         response.raise_for_status()
         return response.json()
 
-    except requests.exceptions.ConnectionError:
-        return {"error": "Connection refused. Is the backend API running?"}
-    except requests.exceptions.HTTPError as e:
-        return {"error": f"HTTP error: {e.response.status_code} {e.response.reason}"}
-    except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Request failed: {e}"}
 
 # --- Process User Input ---
 def process_user_input(text_input, uploaded_file):
     content = text_input.strip() if text_input else ""
 
     if not content and not uploaded_file:
-        return  # No input to send
+        return
 
     user_msg = content if content else "[Image uploaded]"
     st.session_state["messages"].append({
         "role": "user",
-        "content": user_msg,
-        "has_image": uploaded_file is not None  # Just a flag
+        "content": user_msg
     })
 
-    # Display uploaded image (immediate, non-persistent)
     if uploaded_file:
         st.image(uploaded_file, width=160, caption="Uploaded image")
 
     with st.spinner("Thinking..."):
         result = call_backend_api(USER_ID, content, uploaded_file)
 
-    if "error" in result:
-        assistant_reply = f"🚨 **Error:** {result['error']}"
-    else:
-        assistant_reply = result.get("answer", "🤔 I don't know how to respond to that.")
+    assistant_reply = result.get("answer", "🤔 I don't know how to respond to that.")
+    analysis = result.get("image_analysis", None)
 
     st.session_state["messages"].append({
         "role": "assistant",
-        "content": assistant_reply
+        "content": assistant_reply,
+        "image_analysis": analysis
     })
 
 # --- Chat Form ---
@@ -130,19 +123,8 @@ with st.form("chat_form", clear_on_submit=True):
     initial_text = st.session_state["pending_fill"]
     st.session_state["pending_fill"] = ""
 
-    user_input = st.text_input(
-        "Type your question and hit 'Ask', or upload an image",
-        value=initial_text,
-        placeholder="e.g., 'What shoes go with a blue suit?'",
-        label_visibility="collapsed"
-    )
-
-    uploaded_file = st.file_uploader(
-        "Upload an image (optional)",
-        type=["jpg", "jpeg", "png"],
-        label_visibility="collapsed"
-    )
-
+    user_input = st.text_input("Type your question or upload an image", value=initial_text, label_visibility="collapsed")
+    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
     submitted = st.form_submit_button("Ask")
 
     if submitted:
@@ -152,12 +134,9 @@ with st.form("chat_form", clear_on_submit=True):
 st.write("---")
 for msg in st.session_state["messages"]:
     if msg["role"] == "user":
-        st.markdown(
-            f'<div style="text-align:right;"><div class="chat-bubble user-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<div style="text-align:right;"><div class="chat-bubble user-bubble">{msg["content"]}</div></div>', unsafe_allow_html=True)
     else:
-        st.markdown(
-            f'<div style="text-align:left;"><div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<div style="text-align:left;"><div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>', unsafe_allow_html=True)
+        if msg.get("image_analysis"):
+            st.markdown("**🧵 Fashion Analysis**")
+            st.json(msg["image_analysis"])
