@@ -1,5 +1,3 @@
-# app.py
-
 import streamlit as st
 import requests
 
@@ -67,7 +65,7 @@ if "pending_fill" not in st.session_state:
     st.session_state["pending_fill"] = ""
 
 # --- Backend Config ---
-API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
+API_URL = "https://fashion-chatbot-szzt.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
 # --- API Call Logic ---
@@ -105,8 +103,14 @@ def process_user_input(text_input, uploaded_file):
 
     user_msg = content if content else "[Image uploaded]"
     st.session_state["messages"].append({
-        "role": "user", "content": user_msg, "image": uploaded_file
+        "role": "user",
+        "content": user_msg,
+        "has_image": uploaded_file is not None  # Just a flag
     })
+
+    # Display uploaded image (immediate, non-persistent)
+    if uploaded_file:
+        st.image(uploaded_file, width=160, caption="Uploaded image")
 
     with st.spinner("Thinking..."):
         result = call_backend_api(USER_ID, content, uploaded_file)
@@ -117,7 +121,8 @@ def process_user_input(text_input, uploaded_file):
         assistant_reply = result.get("answer", "🤔 I don't know how to respond to that.")
 
     st.session_state["messages"].append({
-        "role": "assistant", "content": assistant_reply
+        "role": "assistant",
+        "content": assistant_reply
     })
 
 # --- Chat Form ---
@@ -151,8 +156,6 @@ for msg in st.session_state["messages"]:
             f'<div style="text-align:right;"><div class="chat-bubble user-bubble">{msg["content"]}</div></div>',
             unsafe_allow_html=True
         )
-        if msg.get("image"):
-            st.image(msg["image"], width=160, caption="Uploaded image")
     else:
         st.markdown(
             f'<div style="text-align:left;"><div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>',
