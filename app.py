@@ -1,160 +1,129 @@
 # app.py
-
 import streamlit as st
 import requests
 
-# --- Streamlit page setup ---
 st.set_page_config(
-    page_title="Fashion AI",
+    page_title="Style Pat Fashion AI",
     page_icon="✨",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# --- CSS for styling ---
 st.markdown("""
     <style>
     .stApp {
-        background-color: #f0f2f6;
-        background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
-        min-height: 100vh;
+      background: linear-gradient(120deg, #e0f2f1 0%, #a7c7e7 100%);
+      min-height: 100vh;
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif !important;
     }
-    .main .block-container {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-        max-width: 700px;
-        margin: auto;
-        text-align: center;
+    .block-container {
+      padding-top: 2.5rem !important;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
     }
-    header, footer {visibility: hidden;}
-    .logo {font-size: 2.5em; margin-bottom: 0.5em;}
-    .chat-bubble {
-        padding: 10px 15px;
-        border-radius: 15px;
-        margin-bottom: 10px;
-        max-width: 70%;
-        display: inline-block;
-        text-align: left;
-        word-wrap: break-word;
-        white-space: pre-wrap;
-    }
-    .user-bubble {background-color: #0b93f6; color: white; margin-left: auto;}
-    .assistant-bubble {background-color: #e5e5ea; color: black; margin-right: auto;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- Page Header ---
-st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
-st.title("Ask our Fashion AI anything")
-st.write("Suggestions on what to ask:")
+# Header with logo and title
+cols = st.columns([1][2], gap="small")
+with cols:
+    st.image(
+        "https://raw.githubusercontent.com/pranay0923/fashion-chatbot-frontend/main/WhatsApp%20Image%202025-07-29%20at%2012.03.57%20PM.jpeg",
+        width=140,
+        use_container_width=False,
+    )
+with cols[1]:
+    st.markdown("<h1>Style Pat Fashion AI</h1>", unsafe_allow_html=True)
 
-suggestions = [
-    "What are the trends for summer?",
-    "Help me find a dress for a wedding",
-    "Suggest an outfit for a casual day"
-]
+st.write("Suggestions on what to ask Our AI")
 
+# Suggestion buttons
 cols = st.columns(3)
-for suggestion, col in zip(suggestions, cols):
-    if col.button(suggestion):
-        st.session_state["pending_fill"] = suggestion
+suggestions = {
+    "What are the trends for summer?": cols,
+    "Help me find a dress for a wedding": cols[1],
+    "Suggest an outfit for a casual day": cols[3]
+}
 
-# --- Session state setup ---
-if "messages" not in st.session_state:
-    st.session_state["messages"] = []
+if 'user_query' not in st.session_state:
+    st.session_state.user_query = ''
 
-if "pending_fill" not in st.session_state:
-    st.session_state["pending_fill"] = ""
+def set_query(text):
+    st.session_state.user_query = text
 
-# --- Backend Config ---
-API_URL = "https://fashion-chatbot-szzt.onrender.com/chat"
+for text, col in suggestions.items():
+    if col.button(text):
+        set_query(text)
+
+# Replace with your deployed backend URL
+API_URL = "https://your-backend-service.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
-# --- API Call Logic ---
-def call_backend_api(user_id, message, image_file=None):
+def get_bot_response(user_id, message, image_file=None):
     try:
-        data = {
-            "user_id": user_id,
-            "message": message
-        }
-
         if image_file:
-            files = {
-                "image": (image_file.name, image_file, image_file.type)
-            }
+            files = {"image": (image_file.name, image_file, image_file.type)}
+            data = {"user_id": user_id, "message": message}
             response = requests.post(API_URL, data=data, files=files)
         else:
+            data = {"user_id": user_id, "message": message}
             response = requests.post(API_URL, data=data)
-
         response.raise_for_status()
         return response.json()
-
     except requests.exceptions.ConnectionError:
-        return {"error": "Connection refused. Is the backend API running?"}
-    except requests.exceptions.HTTPError as e:
-        return {"error": f"HTTP error: {e.response.status_code} {e.response.reason}"}
+        return {"error": "Connection refused. Is the backend API server running?"}
     except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
+        return {"error": f"An error occurred: {e}"}
 
-# --- Process User Input ---
-def process_user_input(text_input, uploaded_file):
-    content = text_input.strip() if text_input else ""
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    if not content and not uploaded_file:
-        return  # No input to send
+def process_input():
+    current_input = st.session_state.user_query
+    uploaded_file = st.session_state.get('uploaded_file')
+    
+    if current_input or uploaded_file:
+        user_message = current_input if current_input else "[Image uploaded]"
+        st.session_state.messages.append({"role": "user", "content": user_message})
+        
+        with st.spinner("Thinking..."):
+            bot_response = get_bot_response(USER_ID, current_input, uploaded_file)
 
-    user_msg = content if content else "[Image uploaded]"
-    st.session_state["messages"].append({
-        "role": "user", "content": user_msg, "image": uploaded_file
-    })
+        if "error" in bot_response:
+            st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_response['error']}"})
+        else:
+            st.session_state.messages.append({"role": "assistant", "content": bot_response.get("answer", "I'm not sure how to respond to that.")})
+        
+        st.session_state.user_query = ""
+        if 'uploaded_file' in st.session_state:
+            del st.session_state['uploaded_file']
 
-    with st.spinner("Thinking..."):
-        result = call_backend_api(USER_ID, content, uploaded_file)
-
-    if "error" in result:
-        assistant_reply = f"🚨 **Error:** {result['error']}"
-    else:
-        assistant_reply = result.get("answer", "🤔 I don't know how to respond to that.")
-
-    st.session_state["messages"].append({
-        "role": "assistant", "content": assistant_reply
-    })
-
-# --- Chat Form ---
+# Input form
 with st.form("chat_form", clear_on_submit=True):
-    initial_text = st.session_state["pending_fill"]
-    st.session_state["pending_fill"] = ""
-
     user_input = st.text_input(
-        "Type your question and hit 'Ask', or upload an image",
-        value=initial_text,
+        "Ask me anything about fashion...",
         placeholder="e.g., 'What shoes go with a blue suit?'",
+        key='user_query',
         label_visibility="collapsed"
     )
-
+    
     uploaded_file = st.file_uploader(
         "Upload an image (optional)",
         type=["jpg", "jpeg", "png"],
+        key='uploaded_file',
         label_visibility="collapsed"
     )
-
+    
     submitted = st.form_submit_button("Ask")
-
+    
     if submitted:
-        process_user_input(user_input, uploaded_file)
+        process_input()
 
-# --- Display Chat History ---
+# Display chat messages
 st.write("---")
-for msg in st.session_state["messages"]:
-    if msg["role"] == "user":
-        st.markdown(
-            f'<div style="text-align:right;"><div class="chat-bubble user-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
-        if msg.get("image"):
-            st.image(msg["image"], width=160, caption="Uploaded image")
+for message in st.session_state.messages:
+    if message["role"] == "user":
+        st.markdown(f'<div style="text-align: right; background: #e8f4fd; padding: 10px; border-radius: 10px; margin: 5px 0;">{message["content"]}</div>', unsafe_allow_html=True)
     else:
-        st.markdown(
-            f'<div style="text-align:left;"><div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<div style="text-align: left; background: #f0f0f0; padding: 10px; border-radius: 10px; margin: 5px 0;">{message["content"]}</div>', unsafe_allow_html=True)
