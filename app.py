@@ -2,6 +2,7 @@
 import streamlit as st
 import requests
 import json
+from io import BytesIO
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -12,12 +13,6 @@ st.set_page_config(
 )
 
 # --- CSS for the Look and Feel ---
-import streamlit as st
-from io import BytesIO
-
-st.set_page_config(page_title="Fashion AI", layout="centered")
-
-# --- Custom CSS for floating search bar and icons ---
 st.markdown("""
 <style>
 .searchbar-container {
