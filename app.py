@@ -67,7 +67,7 @@ if "pending_fill" not in st.session_state:
     st.session_state["pending_fill"] = ""
 
 # --- Backend Config ---
-API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
+API_URL = "https://https://fashion-chatbot-szzt.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
 # --- API Call Logic ---
