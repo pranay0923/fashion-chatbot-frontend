@@ -1,9 +1,9 @@
 # app.py
-
 import streamlit as st
 import requests
+import json
 
-# --- Streamlit page setup ---
+# --- Page Configuration ---
 st.set_page_config(
     page_title="Fashion AI",
     page_icon="✨",
@@ -11,23 +11,45 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CSS for styling ---
+# --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
+    /* Main app background */
     .stApp {
-        background-color: #f0f2f6;
+        background-color: #f0f2f6; /* A light grey background */
         background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
-        min-height: 100vh;
+        height: 100vh;
     }
+    /* Main content area alignment */
     .main .block-container {
         padding-top: 5rem;
         padding-bottom: 5rem;
-        max-width: 700px;
-        margin: auto;
         text-align: center;
     }
-    header, footer {visibility: hidden;}
-    .logo {font-size: 2.5em; margin-bottom: 0.5em;}
+    /* Hide Streamlit's default header and footer */
+    header, footer {
+        visibility: hidden;
+    }
+    /* Style for the logo */
+    .logo {
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+    }
+    /* Style for suggestion buttons */
+    .stButton>button {
+        background-color: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        padding: 0.5em 1em;
+        color: #333;
+        font-weight: normal;
+        transition: all 0.2s;
+    }
+    .stButton>button:hover {
+        border-color: #888;
+        color: #000;
+    }
+    /* Style for chat history */
     .chat-bubble {
         padding: 10px 15px;
         border-radius: 15px;
@@ -35,126 +57,105 @@ st.markdown("""
         max-width: 70%;
         display: inline-block;
         text-align: left;
-        word-wrap: break-word;
-        white-space: pre-wrap;
     }
-    .user-bubble {background-color: #0b93f6; color: white; margin-left: auto;}
-    .assistant-bubble {background-color: #e5e5ea; color: black; margin-right: auto;}
+    .user-bubble {
+        background-color: #0b93f6;
+        color: white;
+        margin-left: auto;
+    }
+    .assistant-bubble {
+        background-color: #e5e5ea;
+        color: black;
+        margin-right: auto;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- Page Header ---
+
+# --- UI Layout ---
 st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
 st.title("Ask our Fashion AI anything")
-st.write("Suggestions on what to ask:")
+st.write("Suggestions on what to ask Our AI")
 
-suggestions = [
-    "What are the trends for summer?",
-    "Help me find a dress for a wedding",
-    "Suggest an outfit for a casual day"
-]
-
+# Suggestion buttons
 cols = st.columns(3)
-for suggestion, col in zip(suggestions, cols):
-    if col.button(suggestion):
-        st.session_state["pending_fill"] = suggestion
+suggestions = {
+    "What are the trends for summer?": cols[0],
+    "Help me find a dress for a wedding": cols[1],
+    "Suggest an outfit for a casual day": cols[2]
+}
 
-# --- Session state setup ---
-if "messages" not in st.session_state:
-    st.session_state["messages"] = []
+# This key is used to manage the text input's state
+if 'user_query' not in st.session_state:
+    st.session_state.user_query = ''
 
-if "pending_fill" not in st.session_state:
-    st.session_state["pending_fill"] = ""
+# Function to set the query from suggestion buttons
+def set_query(text):
+    st.session_state.user_query = text
+    # When a suggestion is clicked, we also want to trigger the processing logic
+    # immediately if the user_query state is updated.
+    # To avoid the StreamlitAPIException, we should not clear the input here.
+    # The input will be cleared after the response is received and displayed.
 
-# --- Backend Config ---
+for text, col in suggestions.items():
+    if col.button(text):
+        set_query(text)
+
+# API calling function
 API_URL = "https://fashion-chatbot-szzt.onrender.com/chat"
-USER_ID = "streamlit_user_01"
+USER_ID = "streamlit_user_01" # A static user ID for this session
 
-# --- API Call Logic ---
-def call_backend_api(user_id, message, image_file=None):
+def get_bot_response(user_id, message):
     try:
-        data = {
-            "user_id": user_id,
-            "message": message
-        }
-
-        if image_file:
-            files = {
-                "image": (image_file.name, image_file, image_file.type)
-            }
-            response = requests.post(API_URL, data=data, files=files)
-        else:
-            response = requests.post(API_URL, data=data)
-
-        response.raise_for_status()
+        response = requests.post(API_URL, json={"user_id": user_id, "message": message})
+        response.raise_for_status() # Raises an error for bad responses (4xx or 5xx)
         return response.json()
-
     except requests.exceptions.ConnectionError:
-        return {"error": "Connection refused. Is the backend API running?"}
-    except requests.exceptions.HTTPError as e:
-        return {"error": f"HTTP error: {e.response.status_code} {e.response.reason}"}
+        return {"error": "Connection refused. Is the backend API server running?"}
     except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}
+        return {"error": f"An error occurred: {e}"}
 
-# --- Process User Input ---
-def process_user_input(text_input, uploaded_file):
-    content = text_input.strip() if text_input else ""
+# --- Chat Logic ---
+# Initialize chat history in session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    if not content and not uploaded_file:
-        return  # No input to send
+# The main chat input
+# Use a callback for the text_input to handle submission and clear it
+def process_input():
+    current_input = st.session_state.user_query # Get the current value from the widget
+    if current_input:
+        # Add user message to history
+        st.session_state.messages.append({"role": "user", "content": current_input})
+        
+        # Get bot response
+        with st.spinner("Thinking..."):
+            bot_response = get_bot_response(USER_ID, current_input)
 
-    user_msg = content if content else "[Image uploaded]"
-    st.session_state["messages"].append({
-        "role": "user", "content": user_msg, "image": uploaded_file
-    })
+        # Check for errors
+        if "error" in bot_response:
+            st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_response['error']}"})
+        else:
+            # Add bot message to history
+            st.session_state.messages.append({"role": "assistant", "content": bot_response.get("answer", "I'm not sure how to respond to that.")})
+        
+        # Clear the input box by setting the session state variable
+        # This will take effect on the next rerun of the script
+        st.session_state.user_query = "" # Clear the input after processing
 
-    with st.spinner("Thinking..."):
-        result = call_backend_api(USER_ID, content, uploaded_file)
+user_input_widget = st.text_input(
+    "Ask me anything about fashion...",
+    placeholder="e.g., 'What shoes go with a blue suit?'",
+    key='user_query',
+    label_visibility="collapsed",
+    on_change=process_input # Call process_input when the input changes (e.g., user presses Enter)
+)
 
-    if "error" in result:
-        assistant_reply = f"🚨 **Error:** {result['error']}"
-    else:
-        assistant_reply = result.get("answer", "🤔 I don't know how to respond to that.")
 
-    st.session_state["messages"].append({
-        "role": "assistant", "content": assistant_reply
-    })
-
-# --- Chat Form ---
-with st.form("chat_form", clear_on_submit=True):
-    initial_text = st.session_state["pending_fill"]
-    st.session_state["pending_fill"] = ""
-
-    user_input = st.text_input(
-        "Type your question and hit 'Ask', or upload an image",
-        value=initial_text,
-        placeholder="e.g., 'What shoes go with a blue suit?'",
-        label_visibility="collapsed"
-    )
-
-    uploaded_file = st.file_uploader(
-        "Upload an image (optional)",
-        type=["jpg", "jpeg", "png"],
-        label_visibility="collapsed"
-    )
-
-    submitted = st.form_submit_button("Ask")
-
-    if submitted:
-        process_user_input(user_input, uploaded_file)
-
-# --- Display Chat History ---
+# Display chat messages from history
 st.write("---")
-for msg in st.session_state["messages"]:
-    if msg["role"] == "user":
-        st.markdown(
-            f'<div style="text-align:right;"><div class="chat-bubble user-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
-        if msg.get("image"):
-            st.image(msg["image"], width=160, caption="Uploaded image")
+for message in st.session_state.messages:
+    if message["role"] == "user":
+        st.markdown(f'<div style="text-align: right;"><div class="chat-bubble user-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
     else:
-        st.markdown(
-            f'<div style="text-align:left;"><div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<div style="text-align: left;"><div class="chat-bubble assistant-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
