@@ -1,173 +1,161 @@
+# app.py
 import streamlit as st
 import requests
+import json
 
-# ------------------- PAGE AND MAIN STYLE -------------------
-st.set_page_config(page_title="Fashion AI", page_icon="✨", layout="centered")
+# --- Page Configuration ---
+st.set_page_config(
+    page_title="Fashion AI",
+    page_icon="✨",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
+# --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
-    .searchbar-container {
-        display: flex;
-        align-items: center;
-        background: #fff;
-        border-radius: 36px;
-        box-shadow: 0 2px 12px rgba(40,48,90,0.07);
-        padding: 0.3rem 1.5rem 0.3rem 1.1rem;
-        margin: 36px auto 12px auto;
-        width: 600px;
-        max-width: 98vw;
-        position: relative;
-        height: 54px;
+    /* Main app background */
+    .stApp {
+        background-color: #f0f2f6; /* A light grey background */
+        background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
+        height: 100vh;
     }
-    .s-tools, .icon-btn { 
-        background: none; border: none; cursor: pointer; 
-        padding: 7px 6px; border-radius: 50%; 
+    /* Main content area alignment */
+    .main .block-container {
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+        text-align: center;
     }
-    .icon-btn:hover { background: #e6e9f4; }
-    .s-divider {
-        border-left: 1.4px solid #ecedf2; 
-        height: 24px; margin: 0 10px;
+    /* Hide Streamlit's default header and footer */
+    header, footer {
+        visibility: hidden;
     }
-    .s-input { 
-        flex: 1; border: none; outline: none; 
-        font-size: 1.1em; background: transparent; 
-        padding: 6px 8px;
+    /* Style for the logo */
+    .logo {
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
     }
-    .chat-bubble { padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; max-width: 70%; display: inline-block; text-align: left;}
-    .user-bubble { background-color: #0b93f6; color: white; margin-left: auto;}
-    .assistant-bubble { background-color: #e5e5ea; color: black; margin-right: auto;}
+    /* Style for suggestion buttons */
+    .stButton>button {
+        background-color: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        padding: 0.5em 1em;
+        color: #333;
+        font-weight: normal;
+        transition: all 0.2s;
+    }
+    .stButton>button:hover {
+        border-color: #888;
+        color: #000;
+    }
+    /* Style for chat history */
+    .chat-bubble {
+        padding: 10px 15px;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        max-width: 70%;
+        display: inline-block;
+        text-align: left;
+    }
+    .user-bubble {
+        background-color: #0b93f6;
+        color: white;
+        margin-left: auto;
+    }
+    .assistant-bubble {
+        background-color: #e5e5ea;
+        color: black;
+        margin-right: auto;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# ------------------- SESSION STATE MANAGEMENT ----------------------
-if 'messages' not in st.session_state:
-    st.session_state['messages'] = []
 
-if 'uploaded_img_search' not in st.session_state:
-    st.session_state['uploaded_img_search'] = None
+# --- UI Layout ---
+st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
+st.title("Ask our Fashion AI anything")
+st.write("Suggestions on what to ask Our AI")
 
-if 'searchquery' not in st.session_state:
-    st.session_state['searchquery'] = ""
+# Suggestion buttons
+cols = st.columns(3)
+suggestions = {
+    "What are the trends for summer?": cols[0],
+    "Help me find a dress for a wedding": cols[1],
+    "Suggest an outfit for a casual day": cols[2]
+}
 
-if 'sel_tool' not in st.session_state:
-    st.session_state['sel_tool'] = "None"
+# This key is used to manage the text input's state
+if 'user_query' not in st.session_state:
+    st.session_state.user_query = ''
 
-# ------------------- SEARCH SUBMISSION FUNCTION ----------------------
-def handle_search_submit():
-    query = st.session_state['searchquery']
-    imgf = st.session_state['uploaded_img_search']
-    selected_tool = st.session_state['sel_tool']
+# Function to set the query from suggestion buttons
+def set_query(text):
+    st.session_state.user_query = text
+    # When a suggestion is clicked, we also want to trigger the processing logic
+    # immediately if the user_query state is updated.
+    # To avoid the StreamlitAPIException, we should not clear the input here.
+    # The input will be cleared after the response is received and displayed.
 
-    content = query.strip()
-    if selected_tool and selected_tool != "None":
-        content += f" [Tool: {selected_tool}]"
-    if not content and not imgf:
-        # Nothing to send
-        return
+for text, col in suggestions.items():
+    if col.button(text):
+        set_query(text)
 
-    # Add user message to chat history, include image if uploaded
-    user_msg = {'role': "user", "content": content}
-    if imgf:
-        user_msg['image'] = imgf
-    st.session_state['messages'].append(user_msg)
+# API calling function
+API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
+USER_ID = "streamlit_user_01" # A static user ID for this session
 
-    # ----- API CALL TO BACKEND -----
-    API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
-    USER_ID = "streamlit_user_01"
-
-    data = {"user_id": USER_ID, "message": content}
-    headers = {}
-    response = None
-
+def get_bot_response(user_id, message):
     try:
-        if imgf is not None and hasattr(imgf, 'read'):
-            # For multipart/form-data submission with image
-            files = {"image": (imgf.name, imgf, imgf.type)}
-            resp = requests.post(API_URL, data=data, files=files, headers=headers)
-        else:
-            # Text only JSON submission
-            resp = requests.post(API_URL, json=data, headers=headers)
-        reply = resp.json().get('answer', "Sorry, I have no response.") if resp is not None else "No response from backend."
+        response = requests.post(API_URL, json={"user_id": user_id, "message": message})
+        response.raise_for_status() # Raises an error for bad responses (4xx or 5xx)
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        return {"error": "Connection refused. Is the backend API server running?"}
     except Exception as e:
-        reply = f"Error communicating with backend: {e}"
+        return {"error": f"An error occurred: {e}"}
 
-    # Append assistant's reply to messages
-    st.session_state['messages'].append({"role": "assistant", "content": reply})
+# --- Chat Logic ---
+# Initialize chat history in session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    # Clear inputs after submission
-    st.session_state['searchquery'] = ""
-    st.session_state['uploaded_img_search'] = None
+# The main chat input
+# Use a callback for the text_input to handle submission and clear it
+def process_input():
+    current_input = st.session_state.user_query # Get the current value from the widget
+    if current_input:
+        # Add user message to history
+        st.session_state.messages.append({"role": "user", "content": current_input})
+        
+        # Get bot response
+        with st.spinner("Thinking..."):
+            bot_response = get_bot_response(USER_ID, current_input)
 
-# ------------------- FLOATING SEARCH BAR UI -------------------
-with st.container():
-    st.markdown('<div class="searchbar-container">', unsafe_allow_html=True)
-    col_tool, col_txt, col_mic, col_sep, col_img, col_btn = st.columns([1.9, 7.5, 1, .5, 1, 1])
+        # Check for errors
+        if "error" in bot_response:
+            st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_response['error']}"})
+        else:
+            # Add bot message to history
+            st.session_state.messages.append({"role": "assistant", "content": bot_response.get("answer", "I'm not sure how to respond to that.")})
+        
+        # Clear the input box by setting the session state variable
+        # This will take effect on the next rerun of the script
+        st.session_state.user_query = "" # Clear the input after processing
 
-    with col_tool:
-        tools = ["None", "Image Search", "Outfit Matcher", "Body Shape Advisor"]
-        selected_tool = st.selectbox(
-            "", tools, index=tools.index(st.session_state['sel_tool']) if st.session_state['sel_tool'] in tools else 0,
-            key="sel_tool", label_visibility="collapsed"
-        )
+user_input_widget = st.text_input(
+    "Ask me anything about fashion...",
+    placeholder="e.g., 'What shoes go with a blue suit?'",
+    key='user_query',
+    label_visibility="collapsed",
+    on_change=process_input # Call process_input when the input changes (e.g., user presses Enter)
+)
 
-    with col_txt:
-        search_query = st.text_input(
-            "", st.session_state['searchquery'], placeholder="Ask anything",
-            key="searchquery", label_visibility="collapsed"
-        )
 
-    with col_mic:
-        st.markdown(
-            '<button class="icon-btn" title="Voice Search (disabled)" disabled>'
-            '<img src="https://cdn-icons-png.flaticon.com/512/3119/3119338.png" width="22"></button>',
-            unsafe_allow_html=True
-        )
-
-    with col_sep:
-        st.markdown('<span class="s-divider"></span>', unsafe_allow_html=True)
-
-    with col_img:
-        uploaded_img = st.file_uploader(
-            "", type=["jpg", "jpeg", "png"],
-            key="uploaded_img_search",
-            label_visibility="collapsed"
-        )
-
-    with col_btn:
-        if st.button("▶️", key="searchbtn", help="Submit query"):
-            handle_search_submit()
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ------------------- SUGGESTIONS BELOW SEARCH BAR -------------------
-st.markdown("""<div style="text-align:center; margin-top: 18px;">
-    <span style="font-size: 1.05em; color: #888;">Suggestions:</span>
-</div>""", unsafe_allow_html=True)
-
-suggestions = [
-    "What are the trends for summer?",
-    "Help me find a dress for a wedding",
-    "Suggest an outfit for a casual day"
-]
-cols = st.columns(len(suggestions))
-for idx, col in enumerate(cols):
-    if col.button(suggestions[idx]):
-        st.session_state['searchquery'] = suggestions[idx]
-
-# ------------------- CHAT HISTORY DISPLAY -------------------
+# Display chat messages from history
 st.write("---")
-for msg in st.session_state['messages']:
-    if msg["role"] == "user":
-        st.markdown(
-            f'<div style="text-align:right;">'
-            f'<div class="chat-bubble user-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
-        if msg.get('image') is not None:
-            st.image(msg['image'], width=120)
+for message in st.session_state.messages:
+    if message["role"] == "user":
+        st.markdown(f'<div style="text-align: right;"><div class="chat-bubble user-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
     else:
-        st.markdown(
-            f'<div style="text-align:left;">'
-            f'<div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<div style="text-align: left;"><div class="chat-bubble assistant-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
