@@ -13,63 +13,79 @@ st.set_page_config(
 
 # --- CSS for the Look and Feel ---
 st.markdown("""
-    <style>
-    /* Main app background */
-    .stApp {
-        background-color: #f0f2f6; /* A light grey background */
-        background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
-        height: 100vh;
-    }
-    /* Main content area alignment */
-    .main .block-container {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-        text-align: center;
-    }
-    /* Hide Streamlit's default header and footer */
-    header, footer {
-        visibility: hidden;
-    }
-    /* Style for the logo */
-    .logo {
-        font-size: 2.5em;
-        margin-bottom: 0.5em;
-    }
-    /* Style for suggestion buttons */
-    .stButton>button {
-        background-color: #ffffff;
-        border: 1px solid #dcdcdc;
-        border-radius: 10px;
-        padding: 0.5em 1em;
-        color: #333;
-        font-weight: normal;
-        transition: all 0.2s;
-    }
-    .stButton>button:hover {
-        border-color: #888;
-        color: #000;
-    }
-    /* Style for chat history */
-    .chat-bubble {
-        padding: 10px 15px;
-        border-radius: 15px;
-        margin-bottom: 10px;
-        max-width: 70%;
-        display: inline-block;
-        text-align: left;
-    }
-    .user-bubble {
-        background-color: #0b93f6;
-        color: white;
-        margin-left: auto;
-    }
-    .assistant-bubble {
-        background-color: #e5e5ea;
-        color: black;
-        margin-right: auto;
-    }
-    </style>
+<style>
+.custom-search {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 2px 16px rgba(100, 110, 140, 0.07);
+    padding: 0.3rem 1.2rem;
+    display: flex;
+    align-items: center;
+    max-width: 600px;
+    margin: 2rem auto 1.5rem auto;
+}
+.custom-search input {
+    border: none !important;
+    outline: none !important;
+    flex: 1;
+    padding: 1em 0.8em;
+    font-size: 1.2em;
+    background: transparent;
+}
+.search-quick {
+    color: #888; margin-left: 6px; font-size: 1.5em;
+    background: none; border: none; cursor: pointer;
+}
+</style>
 """, unsafe_allow_html=True)
+
+st.markdown('<div style="height: 26px"></div>', unsafe_allow_html=True)
+st.markdown('<h2 style="text-align:center;">Ask our Fashion AI anything</h2>', unsafe_allow_html=True)
+
+# --- Centered Search Bar UI ---
+cbar, c = st.columns([2, 5])
+with c:
+    st.markdown('<div class="custom-search">', unsafe_allow_html=True)
+    # Text input for the search query
+    text_query = st.text_input("", "", placeholder="Ask about fashion or upload an image...", key="search_bar", label_visibility="collapsed")
+
+    # Upload button
+    uploaded_img = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=False, key="upload_img", label_visibility="collapsed")
+    st.markdown("&nbsp;", unsafe_allow_html=True)  # Small space
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# --- Handle Input ---
+if text_query or uploaded_img is not None:
+    with st.spinner("Analyzing your query..."):
+        # Show the input for feedback
+        if text_query:
+            st.write(f"**You asked:** {text_query}")
+        if uploaded_img is not None:
+            st.image(uploaded_img, caption="Your uploaded image", width=224)
+            # You may want to send this image to your backend for analysis
+            # For demo, just read as bytes:
+            img_bytes = uploaded_img.read()
+            # - Send to API via multipart/form-data as required
+            # - Or process locally as your application logic
+
+        # Simulate API call (place your bot logic here!)
+        # if text_query:
+        #     response = requests.post(API_URL, data={'text': text_query}, files={'image': uploaded_img})
+        #     st.write(response.text)
+
+# Optionally, display suggestions
+st.markdown("#### Suggestions")
+suggestions = [
+    "What are the latest trends this summer?",
+    "Find me a dress for a party!",
+    "Suggest outfits for my favorite sneakers!"
+]
+cols = st.columns(len(suggestions))
+for idx, col in enumerate(cols):
+    if col.button(suggestions[idx]):
+        st.session_state['search_bar'] = suggestions[idx]  # Fills text input
+
+# Rest of your chat/message display logic can follow...
 
 
 # --- UI Layout ---
