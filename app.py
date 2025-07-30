@@ -1,5 +1,3 @@
-# app.py
-
 import streamlit as st
 import requests
 
@@ -59,15 +57,18 @@ for suggestion, col in zip(suggestions, cols):
     if col.button(suggestion):
         st.session_state["pending_fill"] = suggestion
 
-# --- Session state setup ---
+# --- Initialize session state ---
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
 if "pending_fill" not in st.session_state:
     st.session_state["pending_fill"] = ""
 
+if "uploaded_file" not in st.session_state:
+    st.session_state["uploaded_file"] = None
+
 # --- Backend Config ---
-API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
+API_URL = "https://fashion-chatbot-backend.onrender.com/chat"  # <-- Your backend URL here
 USER_ID = "streamlit_user_01"
 
 # --- API Call Logic ---
@@ -78,9 +79,10 @@ def call_backend_api(user_id, message, image_file=None):
             "message": message
         }
 
-        if image_file:
+        if image_file is not None:
+            # image_file is a UploadedFile object
             files = {
-                "image": (image_file.name, image_file, image_file.type)
+                "image": (image_file.name, image_file.getvalue(), image_file.type)
             }
             response = requests.post(API_URL, data=data, files=files)
         else:
@@ -100,12 +102,14 @@ def call_backend_api(user_id, message, image_file=None):
 def process_user_input(text_input, uploaded_file):
     content = text_input.strip() if text_input else ""
 
-    if not content and not uploaded_file:
+    if not content and uploaded_file is None:
         return  # No input to send
 
-    user_msg = content if content else "[Image uploaded]"
+    # Append user message
     st.session_state["messages"].append({
-        "role": "user", "content": user_msg, "image": uploaded_file
+        "role": "user",
+        "content": content if content else "[Image uploaded]",
+        "image": uploaded_file  # Store UploadedFile or None
     })
 
     with st.spinner("Thinking..."):
@@ -117,8 +121,12 @@ def process_user_input(text_input, uploaded_file):
         assistant_reply = result.get("answer", "🤔 I don't know how to respond to that.")
 
     st.session_state["messages"].append({
-        "role": "assistant", "content": assistant_reply
+        "role": "assistant",
+        "content": assistant_reply
     })
+
+    # Clear input and uploaded file from session state
+    st.session_state["uploaded_file"] = None
 
 # --- Chat Form ---
 with st.form("chat_form", clear_on_submit=True):
@@ -129,12 +137,14 @@ with st.form("chat_form", clear_on_submit=True):
         "Type your question and hit 'Ask', or upload an image",
         value=initial_text,
         placeholder="e.g., 'What shoes go with a blue suit?'",
-        label_visibility="collapsed"
+        label_visibility="collapsed",
+        key="input_text"
     )
 
     uploaded_file = st.file_uploader(
         "Upload an image (optional)",
         type=["jpg", "jpeg", "png"],
+        key="uploaded_file",
         label_visibility="collapsed"
     )
 
@@ -152,7 +162,7 @@ for msg in st.session_state["messages"]:
             unsafe_allow_html=True
         )
         if msg.get("image"):
-            st.image(msg["image"], width=160, caption="Uploaded image")
+            st.image(msg["image"], width=180, caption="Uploaded image")
     else:
         st.markdown(
             f'<div style="text-align:left;"><div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>',
