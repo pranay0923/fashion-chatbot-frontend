@@ -1,8 +1,8 @@
 import streamlit as st
 import requests
-import json
+import streamlit.components.v1 as components
 
-# --- Page Configuration ---
+# --- Config ---
 st.set_page_config(
     page_title="Fashion AI",
     page_icon="✨",
@@ -10,158 +10,32 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CSS Styling ---
-st.markdown("""
-    <style>
-    .stApp {
-        background-color: #f0f2f6;
-        background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
-        height: 100vh;
-    }
-    header, footer { visibility: hidden; }
-    .logo {
-        font-size: 2.5em;
-        text-align: center;
-        margin-bottom: 1em;
-    }
-    .chat-bubble {
-        padding: 10px 15px;
-        border-radius: 15px;
-        margin-bottom: 10px;
-        max-width: 70%;
-        display: inline-block;
-        text-align: left;
-    }
-    .user-bubble {
-        background-color: #0b93f6;
-        color: white;
-        margin-left: auto;
-    }
-    .assistant-bubble {
-        background-color: #e5e5ea;
-        color: black;
-        margin-right: auto;
-    }
-    .search-bar {
-        background-color: white;
-        border-radius: 30px;
-        padding: 10px 20px;
+# --- Custom CSS + HTML + JS ---
+custom_html = """
+<style>
+    .container {
         display: flex;
         align-items: center;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 30px;
         border: 1px solid #ddd;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         margin-bottom: 20px;
     }
-    .search-bar input {
+    input[type=text] {
         border: none;
         outline: none;
+        font-size: 16px;
         flex: 1;
-        font-size: 1em;
-        background: transparent;
+        margin-left: 10px;
     }
-    .search-bar svg {
-        width: 20px;
-        height: 20px;
-        fill: #999;
-        margin: 0 10px;
+    .icon {
         cursor: pointer;
+        margin-left: 10px;
     }
-    </style>
-""", unsafe_allow_html=True)
+</style>
 
-# --- Logo and Title ---
-st.markdown('<div class="logo">✨</div>', unsafe_allow_html=True)
-st.title("Ask our Fashion AI anything")
-
-# --- Suggestion Buttons ---
-st.write("Suggestions on what to ask our AI:")
-cols = st.columns(3)
-suggestions = {
-    "What are the trends for summer?": cols[0],
-    "Help me find a dress for a wedding": cols[1],
-    "Suggest an outfit for a casual day": cols[2]
-}
-if "user_query" not in st.session_state:
-    st.session_state.user_query = ""
-
-def set_query(text):
-    st.session_state.user_query = text
-
-for text, col in suggestions.items():
-    if col.button(text):
-        set_query(text)
-
-# --- API Setup ---
-API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
-USER_ID = "streamlit_user_01"
-
-def get_bot_response(user_id, message):
-    try:
-        response = requests.post(API_URL, json={"user_id": user_id, "message": message})
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.ConnectionError:
-        return {"error": "Connection refused. Is the backend API server running?"}
-    except Exception as e:
-        return {"error": f"An error occurred: {e}"}
-
-# --- Chat History ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# --- Custom Search Bar with Mic ---
-st.markdown("""
-    <div class="search-bar">
-        <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 015.29 13.71l4.3 4.29-1.42 1.42-4.3-4.3A8 8 0 1110 2zm0 2a6 6 0 100 12A6 6 0 0010 4z"></path></svg>
-        <input id="userInput" type="text" placeholder="Ask me anything about fashion..." />
-        <svg id="micIcon" viewBox="0 0 24 24"><path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 7v3h-2v-3h2z"/></svg>
-    </div>
-
-    <script>
-    const input = document.getElementById("userInput");
-    const mic = document.getElementById("micIcon");
-
-    input.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            window.parent.postMessage({ type: "streamlit:setComponentValue", value: input.value }, "*");
-            input.value = "";
-        }
-    });
-
-    mic.addEventListener("click", function() {
-        const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'en-US';
-        recognition.start();
-
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            window.parent.postMessage({ type: "streamlit:setComponentValue", value: transcript }, "*");
-        };
-
-        recognition.onerror = function(event) {
-            console.error("Speech recognition error:", event.error);
-        };
-    });
-    </script>
-""", unsafe_allow_html=True)
-
-# --- Input Triggered via Mic or Text ---
-user_query = st.experimental_get_query_params().get("user_query", [None])[0]  # You can remove this if unused
-if st.session_state.user_query:
-    user_msg = st.session_state.user_query
-    st.session_state.messages.append({"role": "user", "content": user_msg})
-    with st.spinner("Thinking..."):
-        bot_reply = get_bot_response(USER_ID, user_msg)
-    if "error" in bot_reply:
-        st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_reply['error']}"} )
-    else:
-        st.session_state.messages.append({"role": "assistant", "content": bot_reply.get("answer", "I'm not sure how to respond to that.")})
-    st.session_state.user_query = ""
-
-# --- Chat Display ---
-st.write("---")
-for message in st.session_state.messages:
-    if message["role"] == "user":
-        st.markdown(f'<div style="text-align: right;"><div class="chat-bubble user-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div style="text-align: left;"><div class="chat-bubble assistant-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
+<div class="container">
+    <input type="text" id="textInput" placeholder="Ask me anything about fashion..." />
+    <img src="https://img.icons8.com/material-outlined/24/000000/microphone.png"
