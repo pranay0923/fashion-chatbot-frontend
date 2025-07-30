@@ -12,32 +12,6 @@ st.set_page_config(
 )
 
 # --- CSS for the Look and Feel ---
-st.markdown("""
-<style>
-.custom-search {
-    background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 2px 16px rgba(100, 110, 140, 0.07);
-    padding: 0.3rem 1.2rem;
-    display: flex;
-    align-items: center;
-    max-width: 600px;
-    margin: 2rem auto 1.5rem auto;
-}
-.custom-search input {
-    border: none !important;
-    outline: none !important;
-    flex: 1;
-    padding: 1em 0.8em;
-    font-size: 1.2em;
-    background: transparent;
-}
-.search-quick {
-    color: #888; margin-left: 6px; font-size: 1.5em;
-    background: none; border: none; cursor: pointer;
-}
-</style>
-""", unsafe_allow_html=True)
 
 st.markdown('<div style="height: 26px"></div>', unsafe_allow_html=True)
 st.markdown('<h2 style="text-align:center;">Ask our Fashion AI anything</h2>', unsafe_allow_html=True)
@@ -86,6 +60,32 @@ for idx, col in enumerate(cols):
         st.session_state['search_bar'] = suggestions[idx]  # Fills text input
 
 # Rest of your chat/message display logic can follow...
+st.markdown("""
+<style>
+.custom-search {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 2px 16px rgba(100, 110, 140, 0.07);
+    padding: 0.3rem 1.2rem;
+    display: flex;
+    align-items: center;
+    max-width: 600px;
+    margin: 2rem auto 1.5rem auto;
+}
+.custom-search input {
+    border: none !important;
+    outline: none !important;
+    flex: 1;
+    padding: 1em 0.8em;
+    font-size: 1.2em;
+    background: transparent;
+}
+.search-quick {
+    color: #888; margin-left: 6px; font-size: 1.5em;
+    background: none; border: none; cursor: pointer;
+}
+</style>
+""", unsafe_allow_html=True)
 
 
 # --- UI Layout ---
