@@ -39,7 +39,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ------------------- SESSION STATE MGT ----------------------
+# ------------------- SESSION STATE MANAGEMENT ----------------------
 if 'messages' not in st.session_state:
     st.session_state['messages'] = []
 
@@ -52,42 +52,49 @@ if 'searchquery' not in st.session_state:
 if 'sel_tool' not in st.session_state:
     st.session_state['sel_tool'] = "None"
 
-# ------------------- SEARCH SUBMISSION ----------------------
+# ------------------- SEARCH SUBMISSION FUNCTION ----------------------
 def handle_search_submit():
     query = st.session_state['searchquery']
     imgf = st.session_state['uploaded_img_search']
     selected_tool = st.session_state['sel_tool']
 
-    content = query
+    content = query.strip()
     if selected_tool and selected_tool != "None":
         content += f" [Tool: {selected_tool}]"
+    if not content and not imgf:
+        # Nothing to send
+        return
+
+    # Add user message to chat history, include image if uploaded
     user_msg = {'role': "user", "content": content}
     if imgf:
         user_msg['image'] = imgf
     st.session_state['messages'].append(user_msg)
 
-    # ----- Talk to your API (Replace with your endpoint) -----
+    # ----- API CALL TO BACKEND -----
     API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
     USER_ID = "streamlit_user_01"
 
-    files = None
     data = {"user_id": USER_ID, "message": content}
     headers = {}
     response = None
 
     try:
         if imgf is not None and hasattr(imgf, 'read'):
+            # For multipart/form-data submission with image
             files = {"image": (imgf.name, imgf, imgf.type)}
             resp = requests.post(API_URL, data=data, files=files, headers=headers)
         else:
+            # Text only JSON submission
             resp = requests.post(API_URL, json=data, headers=headers)
-        reply = resp.json().get('answer', "Sorry, no answer received.") if resp is not None else "No response."
+        reply = resp.json().get('answer', "Sorry, I have no response.") if resp is not None else "No response from backend."
     except Exception as e:
-        reply = "Error talking to backend." if not hasattr(e, 'strerror') else str(e)
-    
+        reply = f"Error communicating with backend: {e}"
+
+    # Append assistant's reply to messages
     st.session_state['messages'].append({"role": "assistant", "content": reply})
 
-    # Clear search query and image after submit
+    # Clear inputs after submission
     st.session_state['searchquery'] = ""
     st.session_state['uploaded_img_search'] = None
 
@@ -98,12 +105,13 @@ with st.container():
 
     with col_tool:
         tools = ["None", "Image Search", "Outfit Matcher", "Body Shape Advisor"]
-        st.session_state['sel_tool'] = st.selectbox(
-            "", tools, index=0,
+        selected_tool = st.selectbox(
+            "", tools, index=tools.index(st.session_state['sel_tool']) if st.session_state['sel_tool'] in tools else 0,
             key="sel_tool", label_visibility="collapsed"
         )
+
     with col_txt:
-        st.session_state['searchquery'] = st.text_input(
+        search_query = st.text_input(
             "", st.session_state['searchquery'], placeholder="Ask anything",
             key="searchquery", label_visibility="collapsed"
         )
@@ -114,46 +122,52 @@ with st.container():
             '<img src="https://cdn-icons-png.flaticon.com/512/3119/3119338.png" width="22"></button>',
             unsafe_allow_html=True
         )
+
     with col_sep:
         st.markdown('<span class="s-divider"></span>', unsafe_allow_html=True)
+
     with col_img:
-        st.session_state['uploaded_img_search'] = st.file_uploader(
-            "", type=["jpg", "jpeg", "png"], key="uploaded_img_search",
+        uploaded_img = st.file_uploader(
+            "", type=["jpg", "jpeg", "png"],
+            key="uploaded_img_search",
             label_visibility="collapsed"
         )
+
     with col_btn:
-        if st.button("▶️", key="searchbtn", help="Submit", use_container_width=True):
+        if st.button("▶️", key="searchbtn", help="Submit query"):
             handle_search_submit()
+
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ------------------- SUGGESTIONS BELOW SEARCH BAR -----------
+# ------------------- SUGGESTIONS BELOW SEARCH BAR -------------------
 st.markdown("""<div style="text-align:center; margin-top: 18px;">
     <span style="font-size: 1.05em; color: #888;">Suggestions:</span>
 </div>""", unsafe_allow_html=True)
-sugs = [
+
+suggestions = [
     "What are the trends for summer?",
     "Help me find a dress for a wedding",
     "Suggest an outfit for a casual day"
 ]
-scol = st.columns(len(sugs))
-for ix, col in enumerate(scol):
-    if col.button(sugs[ix]):
-        st.session_state['searchquery'] = sugs[ix]
+cols = st.columns(len(suggestions))
+for idx, col in enumerate(cols):
+    if col.button(suggestions[idx]):
+        st.session_state['searchquery'] = suggestions[idx]
 
-# ------------------- CHAT BUBBLES/PREVIOUS HISTORY -----------
+# ------------------- CHAT HISTORY DISPLAY -------------------
 st.write("---")
-for m in st.session_state['messages']:
-    if m["role"] == "user":
+for msg in st.session_state['messages']:
+    if msg["role"] == "user":
         st.markdown(
             f'<div style="text-align:right;">'
-            f'<div class="chat-bubble user-bubble">{m["content"]}</div></div>',
+            f'<div class="chat-bubble user-bubble">{msg["content"]}</div></div>',
             unsafe_allow_html=True
         )
-        if m.get('image'):
-            st.image(m['image'], width=120)
+        if msg.get('image') is not None:
+            st.image(msg['image'], width=120)
     else:
         st.markdown(
             f'<div style="text-align:left;">'
-            f'<div class="chat-bubble assistant-bubble">{m["content"]}</div></div>',
+            f'<div class="chat-bubble assistant-bubble">{msg["content"]}</div></div>',
             unsafe_allow_html=True
         )
