@@ -14,17 +14,42 @@ st.set_page_config(
 # --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
+    /* Main app background */
     .stApp {
-        background-color: #f0f2f6;
+        background-color: #f0f2f6; /* A light grey background */
         background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
         height: 100vh;
     }
-    header, footer { visibility: hidden; }
+    /* Main content area alignment */
+    .main .block-container {
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+        text-align: center;
+    }
+    /* Hide Streamlit's default header and footer */
+    header, footer {
+        visibility: hidden;
+    }
+    /* Style for the logo */
     .logo {
         font-size: 2.5em;
-        text-align: center;
-        margin-bottom: 1em;
+        margin-bottom: 0.5em;
     }
+    /* Style for suggestion buttons */
+    .stButton>button {
+        background-color: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        padding: 0.5em 1em;
+        color: #333;
+        font-weight: normal;
+        transition: all 0.2s;
+    }
+    .stButton>button:hover {
+        border-color: #888;
+        color: #000;
+    }
+    /* Style for chat history */
     .chat-bubble {
         padding: 10px 15px;
         border-radius: 15px;
@@ -42,29 +67,6 @@ st.markdown("""
         background-color: #e5e5ea;
         color: black;
         margin-right: auto;
-    }
-    .search-bar {
-        background-color: white;
-        border-radius: 30px;
-        padding: 10px 20px;
-        display: flex;
-        align-items: center;
-        border: 1px solid #ddd;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
-    }
-    .search-bar input {
-        border: none;
-        outline: none;
-        flex: 1;
-        font-size: 1em;
-        background: transparent;
-    }
-    .search-bar svg {
-        width: 20px;
-        height: 20px;
-        fill: #999;
-        margin: 0 10px;
     }
     </style>
 """, unsafe_allow_html=True)
