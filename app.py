@@ -1,3 +1,4 @@
+# app.py
 import streamlit as st
 import requests
 import json
@@ -10,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CSS Styling ---
+# --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
     .stApp {
@@ -68,36 +69,44 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Logo and Title ---
-st.markdown('<div class="logo">✨</div>', unsafe_allow_html=True)
-st.title("Ask our Fashion AI anything")
 
-# --- Suggestion Buttons ---
-st.write("Suggestions on what to ask our AI:")
+# --- UI Layout ---
+st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
+st.title("Ask our Fashion AI anything")
+st.write("Suggestions on what to ask Our AI")
+
+# Suggestion buttons
 cols = st.columns(3)
 suggestions = {
     "What are the trends for summer?": cols[0],
     "Help me find a dress for a wedding": cols[1],
     "Suggest an outfit for a casual day": cols[2]
 }
-if "user_query" not in st.session_state:
-    st.session_state.user_query = ""
 
+# This key is used to manage the text input's state
+if 'user_query' not in st.session_state:
+    st.session_state.user_query = ''
+
+# Function to set the query from suggestion buttons
 def set_query(text):
     st.session_state.user_query = text
+    # When a suggestion is clicked, we also want to trigger the processing logic
+    # immediately if the user_query state is updated.
+    # To avoid the StreamlitAPIException, we should not clear the input here.
+    # The input will be cleared after the response is received and displayed.
 
 for text, col in suggestions.items():
     if col.button(text):
         set_query(text)
 
-# --- API Setup ---
+# API calling function
 API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
-USER_ID = "streamlit_user_01"
+USER_ID = "streamlit_user_01" # A static user ID for this session
 
 def get_bot_response(user_id, message):
     try:
         response = requests.post(API_URL, json={"user_id": user_id, "message": message})
-        response.raise_for_status()
+        response.raise_for_status() # Raises an error for bad responses (4xx or 5xx)
         return response.json()
     except requests.exceptions.ConnectionError:
         return {"error": "Connection refused. Is the backend API server running?"}
@@ -105,42 +114,43 @@ def get_bot_response(user_id, message):
         return {"error": f"An error occurred: {e}"}
 
 # --- Chat Logic ---
+# Initialize chat history in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- Custom Search Bar UI ---
-search_bar = st.markdown("""
-    <div class="search-bar">
-        <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 015.29 13.71l4.3 4.29-1.42 1.42-4.3-4.3A8 8 0 1110 2zm0 2a6 6 0 100 12A6 6 0 0010 4z"></path></svg>
-        <input id="userInput" type="text" placeholder="Ask me anything about fashion..." />
-        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 019 9h-2a7 7 0 10-7 7v2a9 9 0 010-18z"></path></svg>
-    </div>
-    <script>
-        const input = document.getElementById("userInput");
-        input.addEventListener("keypress", function(e) {
-            if (e.key === "Enter") {
-                window.parent.postMessage(
-                    { type: "streamlit:setComponentValue", value: input.value }, "*"
-                );
-                input.value = "";
-            }
-        });
-    </script>
-""", unsafe_allow_html=True)
+# The main chat input
+# Use a callback for the text_input to handle submission and clear it
+def process_input():
+    current_input = st.session_state.user_query # Get the current value from the widget
+    if current_input:
+        # Add user message to history
+        st.session_state.messages.append({"role": "user", "content": current_input})
+        
+        # Get bot response
+        with st.spinner("Thinking..."):
+            bot_response = get_bot_response(USER_ID, current_input)
 
-# --- Process Input ---
-if st.session_state.user_query:
-    user_msg = st.session_state.user_query
-    st.session_state.messages.append({"role": "user", "content": user_msg})
-    with st.spinner("Thinking..."):
-        bot_reply = get_bot_response(USER_ID, user_msg)
-    if "error" in bot_reply:
-        st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_reply['error']}"} )
-    else:
-        st.session_state.messages.append({"role": "assistant", "content": bot_reply.get("answer", "I'm not sure how to respond to that.")})
-    st.session_state.user_query = ""  # Clear input
+        # Check for errors
+        if "error" in bot_response:
+            st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_response['error']}"})
+        else:
+            # Add bot message to history
+            st.session_state.messages.append({"role": "assistant", "content": bot_response.get("answer", "I'm not sure how to respond to that.")})
+        
+        # Clear the input box by setting the session state variable
+        # This will take effect on the next rerun of the script
+        st.session_state.user_query = "" # Clear the input after processing
 
-# --- Chat History Display ---
+user_input_widget = st.text_input(
+    "Ask me anything about fashion...",
+    placeholder="e.g., 'What shoes go with a blue suit?'",
+    key='user_query',
+    label_visibility="collapsed",
+    on_change=process_input # Call process_input when the input changes (e.g., user presses Enter)
+)
+
+
+# Display chat messages from history
 st.write("---")
 for message in st.session_state.messages:
     if message["role"] == "user":
