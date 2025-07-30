@@ -2,7 +2,7 @@
 import streamlit as st
 import requests
 
-API_URL = "http://localhost:8000/chat"  # Adjust as needed or configure via environment
+API_URL = "https://fashion-chatbot-szzt.onrender.com/chat"  # Adjust as needed or configure via environment
 
 st.title("Fashion Photo Chatbot")
 
