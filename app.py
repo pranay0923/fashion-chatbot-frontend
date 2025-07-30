@@ -12,80 +12,103 @@ st.set_page_config(
 )
 
 # --- CSS for the Look and Feel ---
+import streamlit as st
+from io import BytesIO
 
-st.markdown('<div style="height: 26px"></div>', unsafe_allow_html=True)
-st.markdown('<h2 style="text-align:center;">Ask our Fashion AI anything</h2>', unsafe_allow_html=True)
+st.set_page_config(page_title="Fashion AI", layout="centered")
 
-# --- Centered Search Bar UI ---
-cbar, c = st.columns([2, 5])
-with c:
-    st.markdown('<div class="custom-search">', unsafe_allow_html=True)
-    # Text input for the search query
-    text_query = st.text_input("", "", placeholder="Ask about fashion or upload an image...", key="search_bar", label_visibility="collapsed")
-
-    # Upload button
-    uploaded_img = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=False, key="upload_img", label_visibility="collapsed")
-    st.markdown("&nbsp;", unsafe_allow_html=True)  # Small space
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# --- Handle Input ---
-if text_query or uploaded_img is not None:
-    with st.spinner("Analyzing your query..."):
-        # Show the input for feedback
-        if text_query:
-            st.write(f"**You asked:** {text_query}")
-        if uploaded_img is not None:
-            st.image(uploaded_img, caption="Your uploaded image", width=224)
-            # You may want to send this image to your backend for analysis
-            # For demo, just read as bytes:
-            img_bytes = uploaded_img.read()
-            # - Send to API via multipart/form-data as required
-            # - Or process locally as your application logic
-
-        # Simulate API call (place your bot logic here!)
-        # if text_query:
-        #     response = requests.post(API_URL, data={'text': text_query}, files={'image': uploaded_img})
-        #     st.write(response.text)
-
-# Optionally, display suggestions
-st.markdown("#### Suggestions")
-suggestions = [
-    "What are the latest trends this summer?",
-    "Find me a dress for a party!",
-    "Suggest outfits for my favorite sneakers!"
-]
-cols = st.columns(len(suggestions))
-for idx, col in enumerate(cols):
-    if col.button(suggestions[idx]):
-        st.session_state['search_bar'] = suggestions[idx]  # Fills text input
-
-# Rest of your chat/message display logic can follow...
+# --- Custom CSS for floating search bar and icons ---
 st.markdown("""
 <style>
-.custom-search {
-    background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 2px 16px rgba(100, 110, 140, 0.07);
-    padding: 0.3rem 1.2rem;
+.searchbar-container {
     display: flex;
     align-items: center;
-    max-width: 600px;
-    margin: 2rem auto 1.5rem auto;
+    background: #fff;
+    border-radius: 36px;
+    box-shadow: 0 2px 12px rgba(40,48,90,0.05);
+    padding: 0.3rem 1.5rem 0.3rem 1.1rem;
+    margin: 36px auto 12px auto;
+    width: 600px;
+    max-width: 98vw;
+    position: relative;
+    height: 54px;
 }
-.custom-search input {
-    border: none !important;
-    outline: none !important;
+.s-input {
     flex: 1;
-    padding: 1em 0.8em;
-    font-size: 1.2em;
+    border: none;
+    outline: none;
+    font-size: 1.1em;
     background: transparent;
+    padding: 6px 8px;
 }
-.search-quick {
-    color: #888; margin-left: 6px; font-size: 1.5em;
-    background: none; border: none; cursor: pointer;
+.s-tools {
+    border: none; background: transparent; font-size: 1.05em;
+    color: #606060;
+    margin-right: 12px; cursor: pointer;
+}
+.icon-btn {
+    background: none; border: none; outline: none; cursor: pointer;
+    padding: 7px;
+    margin-left: 1px; border-radius: 50%;
+    transition: background 0.15s;
+}
+.icon-btn:hover {
+    background: #e6e9f4;
+}
+.s-divider {
+    border-left: 1.4px solid #ecedf2;
+    height: 24px; margin: 0 10px;
 }
 </style>
 """, unsafe_allow_html=True)
+
+# --- Search Bar UI Layout ---
+st.markdown('<div class="searchbar-container">', unsafe_allow_html=True)
+
+# Tools dropdown (styled to look like your picture)
+tools = ["None", "Image Search", "Outfit Matcher", "Body Shape Advisor"]
+selected_tool = st.selectbox("Tools", tools, key="sel_tool", label_visibility="collapsed", index=0)
+
+# Text input (to mimic a floating field, use Streamlit's form workaround)
+query = st.text_input("", "", key="searchquery", placeholder="Ask anything", label_visibility="collapsed", help=None)
+
+# Mic icon (only visual, not functional, as Streamlit doesn't have native ASR)
+mic_html = '''<button class="icon-btn" title="Voice Search (disabled)">
+    <img src="https://cdn-icons-png.flaticon.com/512/3119/3119338.png" width="22">
+</button>'''
+st.markdown(mic_html, unsafe_allow_html=True)
+
+# Divider, then Upload icon
+st.markdown('<span class="s-divider"></span>', unsafe_allow_html=True)
+
+uploaded_img = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=False, key="upld_img", label_visibility="collapsed")
+
+upload_html = '''<button class="icon-btn" title="Upload image">
+    <img src="https://cdn-icons-png.flaticon.com/512/1828/1828925.png" width="22">
+</button>'''
+st.markdown(upload_html, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# --- Search logic display (demo handling) ---
+if query or uploaded_img:
+    st.write("**Your Search:**", query)
+    if uploaded_img:
+        st.image(uploaded_img, caption="Uploaded image", width=174)
+    st.info(f"Selected tool: {selected_tool}")
+
+# --- Suggestion Bar Below ---
+st.markdown("""<div style="text-align:center; margin-top: 22px;">
+    <span style="font-size: 1.05em; color: #888;">Suggestions:</span>
+</div>""", unsafe_allow_html=True)
+
+sugs = ["What are the trends for summer?", "Help me find a dress for a wedding", "Suggest an outfit for a casual day"]
+scol = st.columns(len(sugs))
+for ix, col in enumerate(scol):
+    if col.button(sugs[ix]):
+        st.session_state['searchquery'] = sugs[ix]
+
+# ---- Rest of your chat logic (chat bubbles, etc.) goes below ----
 
 
 # --- UI Layout ---
