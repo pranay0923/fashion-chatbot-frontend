@@ -13,24 +13,17 @@ st.set_page_config(
 # --- CSS Styling ---
 st.markdown("""
     <style>
-    /* Main app background */
     .stApp {
         background-color: #f0f2f6;
         background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
         height: 100vh;
     }
-
-    /* Hide Streamlit default header/footer */
     header, footer { visibility: hidden; }
-
-    /* Logo */
     .logo {
         font-size: 2.5em;
         text-align: center;
         margin-bottom: 1em;
     }
-
-    /* Chat bubble styles */
     .chat-bubble {
         padding: 10px 15px;
         border-radius: 15px;
@@ -49,8 +42,6 @@ st.markdown("""
         color: black;
         margin-right: auto;
     }
-
-    /* Search bar container */
     .search-bar {
         background-color: white;
         border-radius: 30px;
@@ -61,7 +52,6 @@ st.markdown("""
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         margin-bottom: 20px;
     }
-
     .search-bar input {
         border: none;
         outline: none;
@@ -69,7 +59,6 @@ st.markdown("""
         font-size: 1em;
         background: transparent;
     }
-
     .search-bar svg {
         width: 20px;
         height: 20px;
@@ -119,7 +108,7 @@ def get_bot_response(user_id, message):
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- Custom Search Bar HTML ---
+# --- Custom Search Bar UI ---
 search_bar = st.markdown("""
     <div class="search-bar">
         <svg viewBox="0 0 24 24"><path d="M10 2a8 8 0 015.29 13.71l4.3 4.29-1.42 1.42-4.3-4.3A8 8 0 1110 2zm0 2a6 6 0 100 12A6 6 0 0010 4z"></path></svg>
@@ -138,9 +127,6 @@ search_bar = st.markdown("""
         });
     </script>
 """, unsafe_allow_html=True)
-
-# --- Streamlit Components Listener ---
-user_query = st.experimental_get_query_params().get("user_query", [None])[0]
 
 # --- Process Input ---
 if st.session_state.user_query:
