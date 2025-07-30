@@ -1,6 +1,7 @@
+# app.py
 import streamlit as st
 import requests
-import streamlit.components.v1 as components
+import json
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -10,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- Custom CSS ---
+# --- CSS for the Look and Feel ---
 st.markdown("""
     <style>
     .stApp {
@@ -19,12 +20,29 @@ st.markdown("""
         height: 100vh;
     }
     .main .block-container {
-        padding-top: 4rem;
-        padding-bottom: 2rem;
+        padding-top: 5rem;
+        padding-bottom: 5rem;
         text-align: center;
     }
     header, footer {
         visibility: hidden;
+    }
+    .logo {
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+    }
+    .stButton>button {
+        background-color: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 10px;
+        padding: 0.5em 1em;
+        color: #333;
+        font-weight: normal;
+        transition: all 0.2s;
+    }
+    .stButton>button:hover {
+        border-color: #888;
+        color: #000;
     }
     .chat-bubble {
         padding: 10px 15px;
@@ -47,22 +65,55 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Page Header ---
-st.markdown('<div style="text-align:center;"><h1>✨ Fashion AI Chatbot</h1></div>', unsafe_allow_html=True)
+# --- UI Layout ---
+st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
+st.title("Ask our Fashion AI anything")
+st.write("Suggestions on what to ask Our AI")
 
-# --- Suggestions ---
-st.write("Suggestions:")
 cols = st.columns(3)
-suggestions = [
-    "What are the trends for summer?",
-    "Help me find a dress for a wedding",
-    "Suggest an outfit for a casual day"
-]
-for text, col in zip(suggestions, cols):
-    if col.button(text):
-        st.session_state.user_query = text
+suggestions = {
+    "What are the trends for summer?": cols[0],
+    "Help me find a dress for a wedding": cols[1],
+    "Suggest an outfit for a casual day": cols[2]
+}
 
-# --- Primary Search Box (Styled) ---
+if 'user_query' not in st.session_state:
+    st.session_state.user_query = ''
+
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
+
+def set_query(text):
+    st.session_state.user_query = text
+
+def get_bot_response(user_id, message):
+    try:
+        response = requests.post("https://fashion-chatbot-backend.onrender.com/chat", json={"user_id": user_id, "message": message})
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        return {"error": "Connection refused. Is the backend API server running?"}
+    except Exception as e:
+        return {"error": f"An error occurred: {e}"}
+
+for text, col in suggestions.items():
+    if col.button(text):
+        set_query(text)
+
+def process_input():
+    current_input = st.session_state.user_query
+    if current_input:
+        st.session_state.messages.append({"role": "user", "content": current_input})
+        with st.spinner("Thinking..."):
+            bot_response = get_bot_response("streamlit_user_01", current_input)
+
+        if "error" in bot_response:
+            st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_response['error']}"})
+        else:
+            st.session_state.messages.append({"role": "assistant", "content": bot_response.get("answer", "I'm not sure how to respond to that.")})
+        st.session_state.user_query = ""
+
+# --- ChatGPT-like Search Input UI ---
 st.markdown("""
 <div style="margin-top: 30px; display: flex; justify-content: center;">
   <form action="" method="get" style="width: 100%; max-width: 700px;">
@@ -106,53 +157,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# File uploader (Image Input)
+uploaded_file = st.file_uploader("📸 Upload a photo (optional)", type=["jpg", "jpeg", "png"])
+if uploaded_file:
+    st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+    st.success("Image uploaded! (Currently not sent to the backend)")
 
-# --- Check for submitted query from the form
-query_params = st.query_params
-if "text_query" in query_params and query_params["text_query"]:
-    st.session_state.user_query = query_params["text_query"]
-
-# --- Backend API ---
-API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
-USER_ID = "streamlit_user_01"
-
-def get_bot_response(user_id, message):
-    try:
-        response = requests.post(API_URL, json={"user_id": user_id, "message": message})
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.ConnectionError:
-        return {"error": "Connection refused. Is the backend API server running?"}
-    except Exception as e:
-        return {"error": f"An error occurred: {e}"}
-
-# --- Chat History Logic ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# --- Process Input ---
-if "user_query" in st.session_state and st.session_state.user_query:
-    current_input = st.session_state.user_query
-    st.session_state.messages.append({"role": "user", "content": current_input})
-
-    with st.spinner("Thinking..."):
-        bot_response = get_bot_response(USER_ID, current_input)
-
-    if "error" in bot_response:
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": f"🚨 **Error:** {bot_response['error']}"
-        })
-    else:
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": bot_response.get("answer", "I'm not sure how to respond to that.")
-        })
-
-    # Clear the query to reset
-    st.session_state.user_query = ""
-
-# --- Display Chat Messages ---
+# Display chat history
 st.write("---")
 for message in st.session_state.messages:
     if message["role"] == "user":
