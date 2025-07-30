@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
+import json
 import streamlit.components.v1 as components
 
-# --- Streamlit Page Setup ---
+# --- Page Configuration ---
 st.set_page_config(
     page_title="Fashion AI",
     page_icon="✨",
@@ -10,7 +11,44 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- Custom Search Bar with Voice Input ---
+# --- Custom CSS Styling ---
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #f0f2f6;
+        background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
+        height: 100vh;
+    }
+    .main .block-container {
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+        text-align: center;
+    }
+    header, footer {
+        visibility: hidden;
+    }
+    .chat-bubble {
+        padding: 10px 15px;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        max-width: 70%;
+        display: inline-block;
+        text-align: left;
+    }
+    .user-bubble {
+        background-color: #0b93f6;
+        color: white;
+        margin-left: auto;
+    }
+    .assistant-bubble {
+        background-color: #e5e5ea;
+        color: black;
+        margin-right: auto;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- Optional Voice Input HTML+JS ---
 custom_html = '''
 <style>
     .container {
@@ -73,11 +111,11 @@ custom_html = '''
 </script>
 '''
 
-# --- Page Header ---
+# --- Header ---
 st.markdown('<div style="text-align:center;"><h1>✨ Fashion AI Chatbot</h1></div>', unsafe_allow_html=True)
 
-# --- Suggestion Buttons ---
-st.write("Suggestions on what to ask:")
+# --- Suggestions ---
+st.write("Suggestions:")
 cols = st.columns(3)
 suggestions = [
     "What are the trends for summer?",
@@ -88,61 +126,53 @@ for text, col in zip(suggestions, cols):
     if col.button(text):
         st.session_state.user_query = text
 
-# --- Display Custom HTML Component ---
-components.html(custom_html, height=140)
-
-# --- Backend Config ---
-API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
-USER_ID = "streamlit_user_01"
-
-# --- Session State Setup ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# --- Manual Fallback Text Input ---
-user_input = st.text_input("Or type your message here 👇", key="manual_input")
+# --- Primary Manual Input ---
+st.markdown("### 💬 Ask me anything about fashion")
+user_input = st.text_input("Type your query below and press Enter:", key="main_input")
 if user_input:
     st.session_state.user_query = user_input
 
-# --- API Call Logic ---
+# --- Optional Voice Input Expander ---
+with st.expander("🎙️ Prefer using mic? Click to expand"):
+    components.html(custom_html, height=140)
+
+# --- API URL and Setup ---
+API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
+USER_ID = "streamlit_user_01"
+
 def get_bot_response(user_id, message):
     try:
         response = requests.post(API_URL, json={"user_id": user_id, "message": message})
         response.raise_for_status()
         return response.json()
+    except requests.exceptions.ConnectionError:
+        return {"error": "Connection refused. Is the backend API server running?"}
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": f"An error occurred: {e}"}
 
-# --- Process Input and Chat Handling ---
+# --- Chat Session Management ---
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# --- Process the Query ---
 if "user_query" in st.session_state and st.session_state.user_query:
-    msg = st.session_state.user_query
-    st.session_state.messages.append({"role": "user", "content": msg})
-
+    query = st.session_state.user_query
+    st.session_state.messages.append({"role": "user", "content": query})
     with st.spinner("Thinking..."):
-        reply = get_bot_response(USER_ID, msg)
+        bot_response = get_bot_response(USER_ID, query)
 
-    if "error" in reply:
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": f"🚨 Error: {reply['error']}"
-        })
+    if "error" in bot_response:
+        st.session_state.messages.append({"role": "assistant", "content": f"🚨 **Error:** {bot_response['error']}"})
     else:
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": reply.get("answer", "Sorry, I didn't get that.")
-        })
+        answer = bot_response.get("answer", "I'm not sure how to respond to that.")
+        st.session_state.messages.append({"role": "assistant", "content": answer})
 
     st.session_state.user_query = ""  # Clear after processing
 
-# --- Display Chat History ---
+# --- Display Chat Messages ---
 st.write("---")
-for m in st.session_state.messages:
-    alignment = "right" if m["role"] == "user" else "left"
-    bg_color = "#0b93f6" if m["role"] == "user" else "#e5e5ea"
-    text_color = "white" if m["role"] == "user" else "black"
-    st.markdown(
-        f'<div style="text-align: {alignment}; padding: 4px;">'
-        f'<div style="display: inline-block; background-color: {bg_color}; color: {text_color}; '
-        f'padding: 10px 15px; border-radius: 15px; max-width: 70%;">{m["content"]}</div></div>',
-        unsafe_allow_html=True
-    )
+for message in st.session_state.messages:
+    if message["role"] == "user":
+        st.markdown(f'<div style="text-align: right;"><div class="chat-bubble user-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div style="text-align: left;"><div class="chat-bubble assistant-bubble">{message["content"]}</div></div>', unsafe_allow_html=True)
