@@ -64,45 +64,53 @@ for text, col in zip(suggestions, cols):
 
 # --- Primary Search Box (Styled) ---
 st.markdown("""
-<div style="background: white; padding: 15px 20px; border-radius: 30px; border: 1px solid #ddd;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; margin-top: 30px;">
-    <form action="" method="get">
-        <input name="text_query" id="text_query" placeholder="Type your query below..." 
-               style="flex: 1; border: none; outline: none; font-size: 16px;" />
-        <button type="submit" 
-                style="background-color: #0b93f6; color: white; border: none; padding: 8px 15px; 
-                       border-radius: 20px; cursor: pointer; font-size: 16px; margin-left: 10px;">
-            🔍 Search
-        </button>
-    </form>
+<div style="margin-top: 30px; display: flex; justify-content: center;">
+  <form action="" method="get" style="width: 100%; max-width: 700px;">
+    <div style="
+        display: flex;
+        border: 1px solid #d1d5db;
+        border-radius: 24px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        background: white;
+        padding: 6px 12px;
+        align-items: center;
+    ">
+      <input 
+        type="text" 
+        name="text_query"
+        placeholder="Type your message and hit Enter..." 
+        style="
+          flex: 1;
+          border: none;
+          outline: none;
+          padding: 12px 10px;
+          font-size: 16px;
+          background: transparent;
+        "
+      />
+      <button type="submit" 
+        style="
+          background-color: #0b93f6;
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          margin-left: 8px;
+          border-radius: 20px;
+          font-size: 15px;
+          cursor: pointer;
+        ">
+        🔍
+      </button>
+    </div>
+  </form>
 </div>
 """, unsafe_allow_html=True)
+
 
 # --- Check for submitted query from the form
 query_params = st.query_params
 if "text_query" in query_params and query_params["text_query"]:
     st.session_state.user_query = query_params["text_query"]
-
-# --- Mic Input (Optional) ---
-with st.expander("🎙️ Prefer using mic? Click to expand"):
-    components.html("""
-        <div style="margin-top: 10px;">
-            <input type="text" id="mic_input" placeholder="Speak or type here..." 
-                style="width: 60%; padding: 10px; border-radius: 25px; border: 1px solid #ccc;">
-            <button onclick="submitQuery()" 
-                style="padding: 10px 20px; margin-left: 10px; border-radius: 25px; background-color: #0b93f6; color: white; border: none;">
-                🎤 Speak
-            </button>
-        </div>
-        <script>
-        function submitQuery() {
-            const val = document.getElementById("mic_input").value;
-            const url = new URL(window.location.href);
-            url.searchParams.set("text_query", val);
-            window.location.href = url.toString();
-        }
-        </script>
-    """, height=140)
 
 # --- Backend API ---
 API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
