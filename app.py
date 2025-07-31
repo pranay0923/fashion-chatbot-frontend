@@ -11,7 +11,7 @@ import io
 # --- Page config and styling ---
 st.set_page_config(
     page_title="Fashion AI Stylist",
-    page_icon="👗",
+    page_icon="✨",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -82,7 +82,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Header and Introduction ---
-st.markdown('<div class="fashion-header">👗 Fashion AI Stylist</div>', unsafe_allow_html=True)
+st.markdown('<div class="fashion-header">✨ Fashion AI Stylist</div>', unsafe_allow_html=True)
 st.markdown("### Get personalized fashion advice with AI-powered styling recommendations")
 
 # --- Configuration Section ---
