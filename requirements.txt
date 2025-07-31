@@ -6,3 +6,14 @@ transformers
 pandas
 scikit-learn
 numpy
+fastapi==0.110.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+openai==1.12.0
+langchain==0.1.5
+langchain-openai==0.0.8
+langchain-community==0.0.20
+faiss-cpu==1.8.0
+chromadb==0.4.22
+pillow>=10.2.0
+python-dotenv==1.0.0
