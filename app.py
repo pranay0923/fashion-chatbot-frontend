@@ -29,7 +29,7 @@ for suggestion, col in zip(suggestions, cols):
         set_query(suggestion)
 
 # 👇 Set your API URL to the Render backend endpoint!
-API_URL = "https://YOUR-BACKEND-URL.onrender.com/chat"
+API_URL = "https://fashion-chatbot-szzt.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
 def encode_image_base64(uploaded_file):
