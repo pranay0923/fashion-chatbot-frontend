@@ -28,7 +28,8 @@ for suggestion, col in zip(suggestions, cols):
     if col.button(suggestion):
         set_query(suggestion)
 
-API_URL = "https://fashion-chatbot-szzt.onrender.com/chat" # Change to your deployed backend URL
+# 👇 Set your API URL to the Render backend endpoint!
+API_URL = "https://YOUR-BACKEND-URL.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
 def encode_image_base64(uploaded_file):
@@ -41,10 +42,9 @@ def call_backend_api(user_id, message, image_file=None):
         if image_file is not None:
             b64 = encode_image_base64(image_file)
             payload = {"user_id": user_id, "message": message, "image_base64": b64}
-            response = requests.post(API_URL, json=payload)
         else:
             payload = {"user_id": user_id, "message": message}
-            response = requests.post(API_URL, json=payload)
+        response = requests.post(API_URL, json=payload)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.ConnectionError:
@@ -56,6 +56,7 @@ def process_user_input(text_input, uploaded_file):
     content = text_input.strip() if text_input else ""
     if not content and uploaded_file is None:
         return
+
     user_message = content if content else "[Image sent]"
     st.session_state["messages"].append({"role": "user", "content": user_message, "image": uploaded_file})
     with st.spinner("Thinking..."):
@@ -93,6 +94,12 @@ for msg in st.session_state["messages"]:
         txt = f"**You:** {msg['content']}"
         if msg.get("image"):
             txt += f" _(Image attached)_"
-        st.markdown(f"""<div style='background:#e3f2fd;border-radius:8px;padding:8px;'>{txt}</div>""", unsafe_allow_html=True)
+        st.markdown(
+            f"""<div style='background:#e3f2fd;border-radius:8px;padding:8px;'>{txt}</div>""",
+            unsafe_allow_html=True
+        )
     else:
-        st.markdown(f"""<div style='background:#f3f7fa;border-radius:8px;padding:8px;'><b>Fashion AI:</b><br>{msg['content']}</div>""", unsafe_allow_html=True)
+        st.markdown(
+            f"""<div style='background:#f3f7fa;border-radius:8px;padding:8px;'><b>Fashion AI:</b><br>{msg['content']}</div>""",
+            unsafe_allow_html=True
+        )
