@@ -18,13 +18,10 @@ st.set_page_config(
 
 # Custom CSS for chat bubbles and better styling
 st.markdown("""
-    <style>
-            html, body, .stApp {
-        background: url('') no-repeat center center fixed;
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color: #fff !important;
+    <style>   
+    background-color: #f0f2f6;
+    background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
+    min-height: 100vh;
     }
         body {
             background: linear-gradient(135deg, #faf4f9, #fffdfc);
