@@ -177,7 +177,7 @@ input, textarea, .stTextInput>div>div>input {
 """, unsafe_allow_html=True)
 
 # --- Configuration (Hidden) ---
-api_url = "https://fashion-chatbot-szzt.onrender.com/chat"  # Your backend API URL
+api_url = "https://fashion-chatbot-szzt.onrender.com/"  # Your backend API URL
 user_id = "streamlit_user_01"      # Default user ID
 
 # --- Header and Introduction ---
