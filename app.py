@@ -176,9 +176,9 @@ input, textarea, .stTextInput>div>div>input {
 </style>
 """, unsafe_allow_html=True)
 
-# --- Configuration (Hidden) ---
-api_url = "https://fashion-chatbot-szzt.onrender.com/"  # Your backend API URL
-user_id = "streamlit_user_01"      # Default user ID
+# --- Configuration ---
+api_url = "https://fashion-chatbot-szzt.onrender.com"  # Fixed: Removed trailing slash
+user_id = "streamlit_user_01"
 
 # --- Header and Introduction ---
 st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
@@ -209,14 +209,17 @@ if "pending_suggestion" not in st.session_state:
 def test_backend_connection(api_url):
     """Test if backend is available"""
     try:
-        response = requests.get(f"{api_url}/health", timeout=5)
+        response = requests.get(f"{api_url}/health", timeout=10)
         if response.status_code == 200:
-            data = response.json()
-            return True, data.get("message", "Connected")
+            try:
+                data = response.json()
+                return True, data.get("message", "Connected")
+            except json.JSONDecodeError:
+                return True, "Connected (text response)"
         else:
             return False, f"HTTP {response.status_code}"
     except requests.exceptions.ConnectionError:
-        return False, "Connection refused - Is the backend running?"
+        return False, "Connection refused - Backend not reachable"
     except requests.exceptions.Timeout:
         return False, "Connection timeout"
     except Exception as e:
@@ -235,14 +238,15 @@ def call_backend_api(user_id, message, image_file=None):
                 "user_id": user_id,
                 "message": message
             }
-            response = requests.post(f"{api_url}/chat", data=data, files=files, timeout=30)
+            response = requests.post(f"{api_url}/chat", data=data, files=files, timeout=60)
         else:
             # Handle text-only request
+            headers = {"Content-Type": "application/json"}
             data = {
                 "user_id": user_id,
                 "message": message
             }
-            response = requests.post(f"{api_url}/chat", data=data, timeout=30)
+            response = requests.post(f"{api_url}/chat", json=data, headers=headers, timeout=60)
         
         response.raise_for_status()
         return response.json()
@@ -250,17 +254,26 @@ def call_backend_api(user_id, message, image_file=None):
     except requests.exceptions.ConnectionError:
         return {
             "success": False,
-            "error": "Cannot connect to backend API. Please ensure the server is running at the specified URL."
+            "error": "Cannot connect to backend API. The server might be temporarily unavailable."
         }
     except requests.exceptions.Timeout:
         return {
             "success": False, 
-            "error": "Request timed out. The server might be processing a complex request."
+            "error": "Request timed out. Please try again."
         }
     except requests.exceptions.HTTPError as e:
+        try:
+            error_msg = e.response.json().get('detail', str(e))
+        except:
+            error_msg = f"HTTP {e.response.status_code}: {e.response.text}"
         return {
             "success": False,
-            "error": f"HTTP Error {e.response.status_code}: {e.response.text}"
+            "error": error_msg
+        }
+    except json.JSONDecodeError:
+        return {
+            "success": False,
+            "error": "Invalid response from server"
         }
     except Exception as e:
         return {
@@ -299,17 +312,24 @@ def process_user_input(text_input, uploaded_file):
         result = call_backend_api(user_id, content, image_file=uploaded_file)
     
     # Process API response
-    if result.get("success", True):
-        answer = result.get("answer", "I'm not sure how to respond to that.")
+    if result.get("success", True) and not result.get("error"):
+        answer = result.get("answer", result.get("response", "I'm not sure how to respond to that."))
         
         # Add recommendations if available
         recommendations = result.get("recommendations", [])
         if recommendations:
             answer += "\n\n### 🛍️ **Personalized Recommendations:**\n"
             for i, rec in enumerate(recommendations, 1):
-                answer += f"{i}. **{rec['name']}** - ${rec['price']} ({rec['brand']})\n"
+                if isinstance(rec, dict):
+                    name = rec.get('name', 'Unknown item')
+                    price = rec.get('price', 'N/A')
+                    brand = rec.get('brand', 'Unknown brand')
+                    answer += f"{i}. **{name}** - ${price} ({brand})\n"
+                else:
+                    answer += f"{i}. {rec}\n"
     else:
-        answer = f"🚨 **Error:** {result.get('error', 'Unknown error occurred')}"
+        error_msg = result.get('error', 'Unknown error occurred')
+        answer = f"🚨 **Error:** {error_msg}"
     
     # Add AI response to chat
     st.session_state["messages"].append({
@@ -347,8 +367,11 @@ with st.form("chat_form", clear_on_submit=True):
     # Preview uploaded image
     if uploaded_file is not None:
         st.write("**Image Preview:**")
-        image = Image.open(uploaded_file)
-        st.image(image, caption=f"Uploaded: {uploaded_file.name}", width=300)
+        try:
+            image = Image.open(uploaded_file)
+            st.image(image, caption=f"Uploaded: {uploaded_file.name}", width=300)
+        except Exception as e:
+            st.error(f"Error loading image: {str(e)}")
     
     # Submit button
     submitted = st.form_submit_button("🔎 Send", type="primary")
@@ -362,7 +385,7 @@ if is_connected:
     st.markdown(f'<div class="status-indicator status-connected">✅ Backend Connected: {status_msg}</div>', unsafe_allow_html=True)
 else:
     st.markdown(f'<div class="status-indicator status-error">❌ Backend Disconnected: {status_msg}</div>', unsafe_allow_html=True)
-    st.warning("⚠️ Backend API is not available. Make sure to run `python api_server.py` first!")
+    st.warning("⚠️ Backend API is not available. Please check your internet connection or try again later.")
 
 # --- Display Chat History ---
 if st.session_state["messages"]:
@@ -388,7 +411,7 @@ if st.session_state["messages"]:
                 try:
                     image = Image.open(msg["image"])
                     st.image(image, caption="Your uploaded image", width=250)
-                except:
+                except Exception as e:
                     st.write("🖼️ [Image was uploaded but cannot be displayed]")
         
         else:
