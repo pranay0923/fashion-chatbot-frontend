@@ -2,412 +2,402 @@ import streamlit as st
 import requests
 import time
 
-# --- Page config ---
+# Page configuration
 st.set_page_config(
-    page_title="Fashion AI Assistant",
-    page_icon="⚡",
+    page_title="Fashion AI",
+    page_icon="✨",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 def apply_gemini_styling():
-    """Apply comprehensive Gemini-inspired CSS styling"""
+    """Apply exact Gemini-inspired CSS styling"""
     st.markdown("""
     <style>
         /* Import Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap');
         
-        /* Main app styling */
-        .stApp {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        /* Hide default Streamlit elements */
+        .stApp {
+            background: #f8f9fa;
+            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Hide Streamlit elements */
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         .stDeployButton {visibility: hidden;}
         header {visibility: hidden;}
+        .css-1rs6os {visibility: hidden;}
+        .css-17ziqus {visibility: hidden;}
         
-        /* Header section */
-        .gemini-header {
+        /* Main container */
+        .main-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        /* Gemini logo and header */
+        .gemini-logo {
             text-align: center;
-            padding: 2rem 0 3rem 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-bottom: 48px;
+        }
+        
+        .logo-text {
+            background: linear-gradient(45deg, #4285f4, #ea4335, #fbbc04, #34a853);
+            background-size: 100% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-size: 64px;
+            font-weight: 400;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+            display: block;
         }
         
         .main-title {
-            font-size: 3rem;
-            font-weight: 300;
-            margin: 0;
-            letter-spacing: -1px;
+            color: #202124;
+            font-size: 56px;
+            font-weight: 400;
+            line-height: 64px;
+            text-align: center;
+            margin-bottom: 8px;
         }
         
         .subtitle {
-            font-size: 1.2rem;
             color: #5f6368;
-            margin-top: 0.5rem;
+            font-size: 20px;
             font-weight: 400;
+            line-height: 28px;
+            text-align: center;
+            margin-bottom: 40px;
         }
         
-        /* Suggestion cards */
+        /* Suggestion chips */
         .suggestions-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-            padding: 0 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 40px;
+            padding: 0 20px;
         }
         
-        .suggestion-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+        .suggestion-chip {
+            background: #f1f3f4;
+            border: 1px solid #e8eaed;
+            border-radius: 24px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 400;
+            color: #3c4043;
             cursor: pointer;
-            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
         }
         
-        .suggestion-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        .suggestion-chip:hover {
+            background: #e8f0fe;
             border-color: #4285f4;
+            color: #1a73e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
-        /* Chat container */
+        /* Search container */
+        .search-container {
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 24px;
+            box-shadow: 0 2px 5px 1px rgba(64,60,67,0.16);
+            margin-bottom: 32px;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .search-container:hover {
+            box-shadow: 0 2px 8px 1px rgba(64,60,67,0.24);
+        }
+        
+        .search-container:focus-within {
+            box-shadow: 0 2px 8px 1px rgba(64,60,67,0.24);
+        }
+        
+        /* Input styling */
+        .stTextInput > div > div > input {
+            border: none !important;
+            border-radius: 24px !important;
+            padding: 16px 20px !important;
+            font-size: 16px !important;
+            font-family: 'Google Sans', sans-serif !important;
+            background: transparent !important;
+            color: #202124 !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        
+        .stTextInput > div > div > input:focus {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+        
+        .stTextInput > div {
+            border: none !important;
+        }
+        
+        .stTextInput {
+            margin: 0 !important;
+        }
+        
+        /* File uploader */
+        .upload-section {
+            border-top: 1px solid #e8eaed;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .stFileUploader {
+            margin: 0 !important;
+        }
+        
+        .stFileUploader > div {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+        
+        .stFileUploader label {
+            color: #5f6368 !important;
+            font-size: 14px !important;
+            font-weight: 400 !important;
+        }
+        
+        /* Submit button */
+        .submit-section {
+            display: flex;
+            justify-content: flex-end;
+            padding: 12px 20px;
+            border-top: 1px solid #e8eaed;
+        }
+        
+        .stButton > button {
+            background: #1a73e8 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 20px !important;
+            padding: 8px 20px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            font-family: 'Google Sans', sans-serif !important;
+            cursor: pointer !important;
+            transition: background-color 0.2s ease !important;
+        }
+        
+        .stButton > button:hover {
+            background: #1557b0 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        
+        .stButton > button:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.24) !important;
+        }
+        
+        /* Chat messages */
         .chat-container {
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-            margin: 2rem 0;
-            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin: 24px 0;
+            padding: 24px;
             max-height: 60vh;
             overflow-y: auto;
         }
         
-        /* Chat messages */
+        .message-container {
+            margin-bottom: 24px;
+        }
+        
         .user-message {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 20px;
-            border-radius: 20px 20px 4px 20px;
-            max-width: 80%;
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 12px 16px;
+            border-radius: 18px 18px 4px 18px;
             margin-left: auto;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            font-size: 15px;
-            line-height: 1.4;
-            word-wrap: break-word;
-            margin-bottom: 1rem;
+            margin-bottom: 8px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 20px;
         }
         
         .assistant-message {
             background: #f8f9fa;
             color: #202124;
-            padding: 16px 20px;
-            border-radius: 20px 20px 20px 4px;
-            max-width: 80%;
+            padding: 16px;
+            border-radius: 16px;
+            max-width: 100%;
+            font-size: 14px;
+            line-height: 20px;
             border-left: 4px solid #4285f4;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            font-size: 15px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            margin-bottom: 1rem;
+        }
+        
+        .ai-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
         }
         
         .ai-avatar {
-            width: 32px;
-            height: 32px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #4285f4, #34a853);
+            background: linear-gradient(45deg, #4285f4, #34a853);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-size: 10px;
+            font-weight: 600;
         }
         
-        /* Input section */
-        .input-section {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .stTextInput > div > div > input {
-            border-radius: 25px;
-            border: 2px solid #e8eaed;
-            padding: 12px 20px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            font-family: 'Google Sans', sans-serif;
-        }
-        
-        .stTextInput > div > div > input:focus {
-            border-color: #4285f4;
-            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
-            outline: none;
-        }
-        
-        .stButton > button {
-            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 24px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
-            font-family: 'Google Sans', sans-serif;
-            width: 100%;
-        }
-        
-        .stButton > button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
-        }
-        
-        /* File uploader */
-        .stFileUploader > div {
-            border: 2px dashed #e8eaed;
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-        
-        .stFileUploader:hover > div {
-            border-color: #4285f4;
-            background: rgba(66, 133, 244, 0.05);
-        }
-        
-        /* Typing indicator */
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            padding: 16px 20px;
-            background: #f8f9fa;
-            border-radius: 20px 20px 20px 4px;
-            margin: 1rem 0;
-            max-width: 80%;
-        }
-        
-        .typing-text {
-            margin-right: 10px;
+        .ai-name {
             color: #5f6368;
-            font-style: italic;
-        }
-        
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #4285f4;
-            margin: 0 2px;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-        
-        .typing-dot:nth-child(2) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(3) { animation-delay: -0.16s; }
-        
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1.2); opacity: 1; }
-        }
-        
-        /* Welcome message */
-        .welcome-message {
-            text-align: center;
-            color: #5f6368;
-            padding: 3rem 2rem;
-        }
-        
-        .welcome-title {
-            color: #4285f4;
-            font-size: 1.5rem;
+            font-size: 12px;
             font-weight: 500;
-            margin-bottom: 1rem;
-        }
-        
-        .feature-tags {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .feature-tag {
-            background: #e8f0fe;
-            color: #1a73e8;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        
-        /* Sidebar styling */
-        .css-1d391kg {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
         }
         
         /* Responsive design */
         @media (max-width: 768px) {
             .main-title {
-                font-size: 2rem;
+                font-size: 32px;
+                line-height: 40px;
             }
             
-            .suggestions-container {
-                grid-template-columns: 1fr;
-                padding: 0;
+            .logo-text {
+                font-size: 48px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+                line-height: 24px;
+            }
+            
+            .suggestion-chip {
+                font-size: 13px;
+                padding: 10px 16px;
             }
             
             .user-message, .assistant-message {
                 max-width: 90%;
             }
         }
+        
+        /* Loading indicator */
+        .loading-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #5f6368;
+            font-size: 14px;
+            padding: 16px;
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #5f6368;
+            animation: pulse 1.4s ease-in-out infinite both;
+        }
+        
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loading-dot:nth-child(3) { animation-delay: 0s; }
+        
+        @keyframes pulse {
+            0%, 80%, 100% {
+                transform: scale(0.6);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Bottom spacing */
+        .bottom-spacing {
+            height: 100px;
+        }
     </style>
     """, unsafe_allow_html=True)
 
 def display_header():
-    """Display the Gemini-inspired header"""
+    """Display Gemini-style header"""
     st.markdown("""
-    <div class="gemini-header">
-        <div class="main-title">⚡ Fashion AI Assistant</div>
-        <div class="subtitle">Ask our Fashion AI anything</div>
+    <div class="gemini-logo">
+        <span class="logo-text">Gemini</span>
+        <h1 class="main-title">What can I help with?</h1>
+        <p class="subtitle">Ask me about fashion, styling, trends, and more</p>
     </div>
     """, unsafe_allow_html=True)
 
 def display_suggestions():
-    """Display suggestion cards"""
-    st.write("**Suggestions on what to ask Our AI**")
-    
-    cols = st.columns(3)
+    """Display suggestion chips exactly like Gemini"""
     suggestions = [
-        "What are the trends for summer?",
-        "Help me find a dress for a wedding",
-        "Suggest an outfit for a casual day"
+        "What are the latest fashion trends?",
+        "Help me choose an outfit for work",
+        "Color combinations for summer",
+        "Style tips for my body type"
     ]
     
-    for suggestion, col in zip(suggestions, cols):
-        with col:
-            if st.button(suggestion, key=f"suggestion_{suggestion}", use_container_width=True):
-                st.session_state["pending_fill"] = suggestion
-                st.rerun()
+    chips_html = '<div class="suggestions-container">'
+    for i, suggestion in enumerate(suggestions):
+        chips_html += f'<div class="suggestion-chip" onclick="setSuggestion(\'{suggestion}\')">{suggestion}</div>'
+    chips_html += '</div>'
+    
+    st.markdown(chips_html, unsafe_allow_html=True)
 
-def show_typing_indicator():
-    """Show typing animation"""
+def show_loading():
+    """Show Gemini-style loading indicator"""
     st.markdown("""
-    <div class="typing-indicator">
-        <div class="typing-text">Thinking...</div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
+    <div class="loading-container">
+        <span>Thinking</span>
+        <div class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
-def show_welcome_message():
-    """Display welcome message for new users"""
-    st.markdown("""
-    <div class="welcome-message">
-        <div class="welcome-title">👋 Welcome to Fashion AI!</div>
-        <p>I'm your personal fashion assistant. I can help you with style advice, color coordination, outfit planning, and much more!</p>
-        <div class="feature-tags">
-            <span class="feature-tag">Style Advice</span>
-            <span class="feature-tag">Color Matching</span>
-            <span class="feature-tag">Outfit Planning</span>
-            <span class="feature-tag">Shopping Tips</span>
-        </div>
-        <p style="margin-top: 1.5rem;">Start by asking me a question or try one of the suggestions above!</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-def create_sidebar():
-    """Create modern sidebar"""
-    with st.sidebar:
-        st.markdown("""
-        <div style="text-align: center; padding: 1rem 0 2rem 0;">
-            <h2 style="color: #4285f4; margin-bottom: 0.5rem;">💎 Fashion AI</h2>
-            <p style="color: #5f6368; font-size: 0.9rem;">Your personal style assistant</p>
-            <div style="height: 2px; background: linear-gradient(90deg, #4285f4, #34a853); margin: 1rem 0;"></div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Quick actions
-        st.markdown("### ⚡ Quick Actions")
-        if st.button("🔄 Clear Chat", use_container_width=True):
-            st.session_state["messages"] = []
-            st.rerun()
-        
-        if st.button("💡 Fashion Tips", use_container_width=True):
-            st.session_state["show_tips"] = True
-        
-        # App info
-        st.markdown("### ℹ️ About")
-        st.info("""
-        **Fashion AI Assistant** uses advanced AI to provide personalized fashion advice, style recommendations, and outfit planning assistance.
-        
-        **Features:**
-        - Image analysis
-        - Style recommendations  
-        - Color coordination
-        - Trend insights
-        - Shopping guidance
-        """)
-        
-        # Tips section
-        if st.session_state.get("show_tips", False):
-            st.markdown("### 🎯 Quick Tips")
-            st.success("""
-            **Color Basics:**
-            - Neutrals go with everything
-            - Use the 60-30-10 rule
-            - Consider your skin tone
-            
-            **Fit Matters:**
-            - Well-fitted clothes look expensive
-            - Know your measurements
-            - Tailor when needed
-            """)
-            
-            if st.button("Hide Tips"):
-                st.session_state["show_tips"] = False
-                st.rerun()
-
-# Backend API configuration (kept from your original code)
+# Backend API configuration
 API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
 def call_backend_api(user_id, message, image_file=None):
-    """Call the backend API - kept exactly as your original"""
+    """Call the backend API"""
     try:
         if image_file is not None:
             files = {
@@ -417,10 +407,10 @@ def call_backend_api(user_id, message, image_file=None):
                 "user_id": user_id,
                 "message": message
             }
-            response = requests.post(API_URL, data=data, files=files)
+            response = requests.post(API_URL, data=data, files=files, timeout=30)
         else:
             json_data = {"user_id": user_id, "message": message}
-            response = requests.post(API_URL, json=json_data)
+            response = requests.post(API_URL, json=json_data, timeout=30)
 
         response.raise_for_status()
         return response.json()
@@ -430,31 +420,36 @@ def call_backend_api(user_id, message, image_file=None):
         return {"error": f"An error occurred: {e}"}
 
 def process_user_input(text_input, uploaded_file):
-    """Process user input - kept exactly as your original with styling updates"""
+    """Process user input and get AI response"""
     content = text_input.strip() if text_input else ""
     if not content and uploaded_file is None:
-        # Nothing to send
         return
 
     user_message = content if content else "[Image sent]"
-    st.session_state["messages"].append({"role": "user", "content": user_message, "image": uploaded_file})
+    st.session_state["messages"].append({
+        "role": "user", 
+        "content": user_message, 
+        "image": uploaded_file
+    })
 
-    # Show typing indicator
-    typing_placeholder = st.empty()
-    with typing_placeholder:
-        show_typing_indicator()
+    # Show loading indicator
+    loading_placeholder = st.empty()
+    with loading_placeholder:
+        show_loading()
     
+    # Call API
     result = call_backend_api(USER_ID, content, image_file=uploaded_file)
     
-    # Clear typing indicator
-    typing_placeholder.empty()
+    # Clear loading indicator
+    loading_placeholder.empty()
 
     if "error" in result:
-        answer = f"🚨 **Error:** {result['error']}"
+        answer = f"I'm sorry, I encountered an error: {result['error']}"
     else:
         answer = result.get("answer", "I'm not sure how to respond to that.")
 
     st.session_state["messages"].append({"role": "assistant", "content": answer})
+    st.rerun()
 
 def main():
     """Main application function"""
@@ -463,84 +458,110 @@ def main():
         st.session_state["messages"] = []
     if "pending_fill" not in st.session_state:
         st.session_state["pending_fill"] = ""
-    if "show_tips" not in st.session_state:
-        st.session_state["show_tips"] = False
 
     # Apply styling
     apply_gemini_styling()
     
-    # Create layout
-    main_col, sidebar_space = st.columns([4, 1])
+    # Add JavaScript for suggestion clicks
+    st.markdown("""
+    <script>
+    function setSuggestion(text) {
+        const input = document.querySelector('input[type="text"]');
+        if (input) {
+            input.value = text;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+    </script>
+    """, unsafe_allow_html=True)
     
-    with main_col:
-        # Header
+    # Main container
+    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    
+    # Header (only show if no messages)
+    if not st.session_state["messages"]:
         display_header()
-        
-        # Show suggestions only if no messages
-        if not st.session_state["messages"]:
-            display_suggestions()
-        
-        # Chat container
+        display_suggestions()
+    
+    # Chat messages
+    if st.session_state["messages"]:
         st.markdown('<div class="chat-container">', unsafe_allow_html=True)
         
-        if not st.session_state["messages"]:
-            show_welcome_message()
-        else:
-            # Display chat history exactly as your original with updated styling
-            for msg in st.session_state["messages"]:
-                if msg["role"] == "user":
-                    st.markdown(
-                        f'<div style="text-align:right;"><div class="user-message">{msg["content"]}</div></div>',
-                        unsafe_allow_html=True
-                    )
-                    if msg.get("image") is not None:
-                        col1, col2, col3 = st.columns([2, 1, 2])
-                        with col2:
-                            st.image(msg["image"], width=160, caption="Your uploaded image")
-                else:
-                    st.markdown(f"""
-                    <div style="text-align:left;">
-                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                            <div class="ai-avatar">AI</div>
-                            <span style="color: #4285f4; font-weight: 500; margin-left: 8px;">Fashion AI</span>
-                        </div>
-                        <div class="assistant-message">{msg["content"]}</div>
+        for msg in st.session_state["messages"]:
+            if msg["role"] == "user":
+                st.markdown(f"""
+                <div class="message-container">
+                    <div style="text-align: right;">
+                        <div class="user-message">{msg["content"]}</div>
                     </div>
-                    """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Input section exactly as your original
-        st.markdown('<div class="input-section">', unsafe_allow_html=True)
-        
-        with st.form("chat_form", clear_on_submit=True):
-            # Pre-fill input if user clicked a suggestion
-            initial_text = st.session_state["pending_fill"]
-            if initial_text:
-                st.session_state["pending_fill"] = ""  # clear after use
-
-            user_input = st.text_input(
-                "Type your question and hit 'Ask', or upload an image",
-                value=initial_text,
-                key="user_query",
-                placeholder="e.g., 'What shoes go with a blue suit?'",
-                label_visibility="collapsed"
-            )
-            uploaded_file = st.file_uploader(
-                "Upload an image (optional)",
-                type=["jpg", "jpeg", "png"],
-                key="uploaded_file",
-                label_visibility="collapsed"
-            )
-            submitted = st.form_submit_button("Ask", use_container_width=True)
-
-            if submitted:
-                process_user_input(user_input, uploaded_file)
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if msg.get("image") is not None:
+                    col1, col2, col3 = st.columns([1, 1, 1])
+                    with col2:
+                        st.image(msg["image"], width=200, caption="Your uploaded image")
+            
+            else:
+                st.markdown(f"""
+                <div class="message-container">
+                    <div class="ai-label">
+                        <div class="ai-avatar">G</div>
+                        <span class="ai-name">Gemini</span>
+                    </div>
+                    <div class="assistant-message">{msg["content"]}</div>
+                </div>
+                """, unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # Sidebar
-    create_sidebar()
+    # Search container
+    st.markdown('<div class="search-container">', unsafe_allow_html=True)
+    
+    with st.form("chat_form", clear_on_submit=True):
+        # Handle pre-filled text from suggestions
+        initial_text = st.session_state["pending_fill"]
+        if initial_text:
+            st.session_state["pending_fill"] = ""
+
+        user_input = st.text_input(
+            "Message Gemini",
+            value=initial_text,
+            key="user_query",
+            placeholder="Enter a prompt here",
+            label_visibility="collapsed"
+        )
+        
+        # Upload section
+        st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+        uploaded_file = st.file_uploader(
+            "📎 Add image",
+            type=["jpg", "jpeg", "png"],
+            key="uploaded_file",
+            label_visibility="visible"
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Submit section
+        st.markdown('<div class="submit-section">', unsafe_allow_html=True)
+        submitted = st.form_submit_button("➤")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        if submitted:
+            process_user_input(user_input, uploaded_file)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Handle suggestion clicks via query params
+    query_params = st.experimental_get_query_params()
+    if "suggestion" in query_params:
+        suggestion_text = query_params["suggestion"][0]
+        st.session_state["pending_fill"] = suggestion_text
+        st.experimental_set_query_params()
+        st.rerun()
+    
+    st.markdown('<div class="bottom-spacing"></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
