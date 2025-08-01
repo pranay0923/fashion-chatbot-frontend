@@ -20,7 +20,7 @@ st.set_page_config(
 st.markdown("""
     <style>
             html, body, .stApp {
-        background: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+        background: url('') no-repeat center center fixed;
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
