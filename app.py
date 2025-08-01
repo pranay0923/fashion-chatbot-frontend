@@ -29,13 +29,6 @@ def apply_gemini_styling():
         .stDeployButton {visibility: hidden;}
         header {visibility: hidden;}
         
-        /* Main container */
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-        
         /* Header section */
         .gemini-header {
             text-align: center;
@@ -85,19 +78,6 @@ def apply_gemini_styling():
             border-color: #4285f4;
         }
         
-        .suggestion-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        .suggestion-text {
-            color: #202124;
-            font-weight: 500;
-            font-size: 1rem;
-            line-height: 1.4;
-        }
-        
         /* Chat container */
         .chat-container {
             background: white;
@@ -110,20 +90,6 @@ def apply_gemini_styling():
         }
         
         /* Chat messages */
-        .message-container {
-            margin: 1rem 0;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .user-message-container {
-            align-items: flex-end;
-        }
-        
-        .assistant-message-container {
-            align-items: flex-start;
-        }
-        
         .user-message {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -135,6 +101,7 @@ def apply_gemini_styling():
             font-size: 15px;
             line-height: 1.4;
             word-wrap: break-word;
+            margin-bottom: 1rem;
         }
         
         .assistant-message {
@@ -148,6 +115,7 @@ def apply_gemini_styling():
             font-size: 15px;
             line-height: 1.5;
             word-wrap: break-word;
+            margin-bottom: 1rem;
         }
         
         .ai-avatar {
@@ -162,13 +130,6 @@ def apply_gemini_styling():
             font-size: 14px;
             font-weight: bold;
             margin-bottom: 8px;
-        }
-        
-        .ai-label {
-            color: #4285f4;
-            font-weight: 500;
-            font-size: 14px;
-            margin-left: 8px;
         }
         
         /* Input section */
@@ -341,65 +302,32 @@ def display_header():
     st.markdown("""
     <div class="gemini-header">
         <div class="main-title">⚡ Fashion AI Assistant</div>
-        <div class="subtitle">Powered by AI • Style recommendations • Fashion insights</div>
+        <div class="subtitle">Ask our Fashion AI anything</div>
     </div>
     """, unsafe_allow_html=True)
 
 def display_suggestions():
     """Display suggestion cards"""
-    suggestions = [
-        {"icon": "🌟", "text": "What are the trending colors for this season?"},
-        {"icon": "👗", "text": "Help me find a dress for a wedding"},
-        {"icon": "👔", "text": "Suggest a professional outfit for work"},
-        {"icon": "🌙", "text": "What should I wear for a dinner date?"},
-        {"icon": "👟", "text": "Recommend casual weekend outfits"},
-        {"icon": "🎨", "text": "How do I mix and match patterns?"}
-    ]
-    
-    st.markdown("### 💡 Try asking about...")
+    st.write("**Suggestions on what to ask Our AI**")
     
     cols = st.columns(3)
-    for i, suggestion in enumerate(suggestions):
-        col_idx = i % 3
-        with cols[col_idx]:
-            if st.button(
-                f"{suggestion['icon']} {suggestion['text']}", 
-                key=f"suggestion_{i}",
-                use_container_width=True
-            ):
-                st.session_state["pending_fill"] = suggestion['text']
-                st.rerun()
-
-def display_chat_message(role, content, image=None):
-    """Display a chat message with Gemini styling"""
-    if role == "user":
-        st.markdown(f"""
-        <div class="message-container user-message-container">
-            <div class="user-message">{content}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if image:
-            col1, col2, col3 = st.columns([2, 1, 2])
-            with col2:
-                st.image(image, width=150, caption="Your image")
+    suggestions = [
+        "What are the trends for summer?",
+        "Help me find a dress for a wedding",
+        "Suggest an outfit for a casual day"
+    ]
     
-    else:
-        st.markdown(f"""
-        <div class="message-container assistant-message-container">
-            <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <div class="ai-avatar">AI</div>
-                <div class="ai-label">Fashion AI</div>
-            </div>
-            <div class="assistant-message">{content}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    for suggestion, col in zip(suggestions, cols):
+        with col:
+            if st.button(suggestion, key=f"suggestion_{suggestion}", use_container_width=True):
+                st.session_state["pending_fill"] = suggestion
+                st.rerun()
 
 def show_typing_indicator():
     """Show typing animation"""
     st.markdown("""
     <div class="typing-indicator">
-        <div class="typing-text">AI is thinking...</div>
+        <div class="typing-text">Thinking...</div>
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
         <div class="typing-dot"></div>
@@ -474,69 +402,59 @@ def create_sidebar():
                 st.session_state["show_tips"] = False
                 st.rerun()
 
-# Backend API configuration
+# Backend API configuration (kept from your original code)
 API_URL = "https://fashion-chatbot-backend.onrender.com/chat"
 USER_ID = "streamlit_user_01"
 
 def call_backend_api(user_id, message, image_file=None):
-    """Call the backend API"""
+    """Call the backend API - kept exactly as your original"""
     try:
         if image_file is not None:
-            files = {"image": (image_file.name, image_file, image_file.type)}
-            data = {"user_id": user_id, "message": message}
-            response = requests.post(API_URL, data=data, files=files, timeout=30)
+            files = {
+                "image": (image_file.name, image_file, image_file.type)
+            }
+            data = {
+                "user_id": user_id,
+                "message": message
+            }
+            response = requests.post(API_URL, data=data, files=files)
         else:
             json_data = {"user_id": user_id, "message": message}
-            response = requests.post(API_URL, json=json_data, timeout=30)
+            response = requests.post(API_URL, json=json_data)
 
         response.raise_for_status()
         return response.json()
     except requests.exceptions.ConnectionError:
-        return {"error": "Unable to connect to the fashion AI service. Please try again later."}
-    except requests.exceptions.Timeout:
-        return {"error": "Request timed out. Please try again."}
+        return {"error": "Connection refused. Is the backend API server running?"}
     except Exception as e:
-        return {"error": f"An unexpected error occurred: {str(e)}"}
+        return {"error": f"An error occurred: {e}"}
 
 def process_user_input(text_input, uploaded_file):
-    """Process user input and get AI response"""
+    """Process user input - kept exactly as your original with styling updates"""
     content = text_input.strip() if text_input else ""
-    
     if not content and uploaded_file is None:
+        # Nothing to send
         return
 
-    # Add user message
-    user_message = content if content else "I've uploaded an image for analysis"
-    st.session_state["messages"].append({
-        "role": "user", 
-        "content": user_message, 
-        "image": uploaded_file
-    })
+    user_message = content if content else "[Image sent]"
+    st.session_state["messages"].append({"role": "user", "content": user_message, "image": uploaded_file})
 
     # Show typing indicator
     typing_placeholder = st.empty()
     with typing_placeholder:
         show_typing_indicator()
     
-    # Simulate thinking time
-    time.sleep(1)
-    
-    # Call API
     result = call_backend_api(USER_ID, content, image_file=uploaded_file)
     
     # Clear typing indicator
     typing_placeholder.empty()
 
     if "error" in result:
-        answer = f"🚨 **Error:** {result['error']}\n\nTry asking about:\n- Fashion trends\n- Color combinations\n- Outfit suggestions\n- Style tips"
+        answer = f"🚨 **Error:** {result['error']}"
     else:
-        answer = result.get("answer", "I'm here to help with your fashion questions! Try asking about styles, colors, or outfit ideas.")
+        answer = result.get("answer", "I'm not sure how to respond to that.")
 
-    # Add AI response
     st.session_state["messages"].append({"role": "assistant", "content": answer})
-    
-    # Rerun to show new messages
-    st.rerun()
 
 def main():
     """Main application function"""
@@ -568,39 +486,53 @@ def main():
         if not st.session_state["messages"]:
             show_welcome_message()
         else:
-            # Display chat history
+            # Display chat history exactly as your original with updated styling
             for msg in st.session_state["messages"]:
-                display_chat_message(
-                    msg["role"], 
-                    msg["content"], 
-                    msg.get("image")
-                )
+                if msg["role"] == "user":
+                    st.markdown(
+                        f'<div style="text-align:right;"><div class="user-message">{msg["content"]}</div></div>',
+                        unsafe_allow_html=True
+                    )
+                    if msg.get("image") is not None:
+                        col1, col2, col3 = st.columns([2, 1, 2])
+                        with col2:
+                            st.image(msg["image"], width=160, caption="Your uploaded image")
+                else:
+                    st.markdown(f"""
+                    <div style="text-align:left;">
+                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                            <div class="ai-avatar">AI</div>
+                            <span style="color: #4285f4; font-weight: 500; margin-left: 8px;">Fashion AI</span>
+                        </div>
+                        <div class="assistant-message">{msg["content"]}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
         
-        # Input section
+        # Input section exactly as your original
         st.markdown('<div class="input-section">', unsafe_allow_html=True)
         
         with st.form("chat_form", clear_on_submit=True):
-            # Handle pre-filled text from suggestions
+            # Pre-fill input if user clicked a suggestion
             initial_text = st.session_state["pending_fill"]
             if initial_text:
-                st.session_state["pending_fill"] = ""
+                st.session_state["pending_fill"] = ""  # clear after use
 
             user_input = st.text_input(
-                "Ask me anything about fashion...",
+                "Type your question and hit 'Ask', or upload an image",
                 value=initial_text,
-                placeholder="e.g., 'What shoes go with a blue suit?' or 'Help me style this outfit'",
+                key="user_query",
+                placeholder="e.g., 'What shoes go with a blue suit?'",
                 label_visibility="collapsed"
             )
-            
             uploaded_file = st.file_uploader(
-                "Upload an image for style analysis (optional)",
+                "Upload an image (optional)",
                 type=["jpg", "jpeg", "png"],
+                key="uploaded_file",
                 label_visibility="collapsed"
             )
-            
-            submitted = st.form_submit_button("✨ Ask Fashion AI", use_container_width=True)
+            submitted = st.form_submit_button("Ask", use_container_width=True)
 
             if submitted:
                 process_user_input(user_input, uploaded_file)
