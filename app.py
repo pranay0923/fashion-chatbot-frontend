@@ -94,7 +94,7 @@ header, footer {
     padding: 8px 14px;
     border-radius: 20px;
     font-size: 0.85em;
-    margin: 8px 0;
+    margin: 15px 0;
     font-weight: 600;
     display: inline-block;
     text-align: center;
@@ -177,36 +177,11 @@ input, textarea, .stTextInput>div>div>input {
 """, unsafe_allow_html=True)
 
 # --- Configuration (Hidden) ---
-api_url = "https://fashion-chatbot-szzt.onrender.com/chat"  # Your backend API URL
+api_url = "http://localhost:8000"  # Your backend API URL
 user_id = "streamlit_user_01"      # Default user ID
 
 # --- Header and Introduction ---
 st.markdown('<div class="fashion-header">👗 Fashion AI Stylist</div>', unsafe_allow_html=True)
-
-# Test backend connection
-def test_backend_connection(api_url):
-    """Test if backend is available"""
-    try:
-        response = requests.get(f"{api_url}/health", timeout=5)
-        if response.status_code == 200:
-            data = response.json()
-            return True, data.get("message", "Connected")
-        else:
-            return False, f"HTTP {response.status_code}"
-    except requests.exceptions.ConnectionError:
-        return False, "Connection refused - Is the backend running?"
-    except requests.exceptions.Timeout:
-        return False, "Connection timeout"
-    except Exception as e:
-        return False, f"Error: {str(e)}"
-
-# Display connection status
-is_connected, status_msg = test_backend_connection(api_url)
-if is_connected:
-    st.markdown(f'<div class="status-indicator status-connected">✅ Backend Connected: {status_msg}</div>', unsafe_allow_html=True)
-else:
-    st.markdown(f'<div class="status-indicator status-error">❌ Backend Disconnected: {status_msg}</div>', unsafe_allow_html=True)
-    st.warning("⚠️ Backend API is not available. Make sure to run `python api_server.py` first!")
 
 # --- Suggestions Section ---
 st.write("### 💡 Quick Suggestions")
@@ -228,6 +203,23 @@ if "messages" not in st.session_state:
     st.session_state["messages"] = []
 if "pending_suggestion" not in st.session_state:
     st.session_state["pending_suggestion"] = ""
+
+# Test backend connection
+def test_backend_connection(api_url):
+    """Test if backend is available"""
+    try:
+        response = requests.get(f"{api_url}/health", timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            return True, data.get("message", "Connected")
+        else:
+            return False, f"HTTP {response.status_code}"
+    except requests.exceptions.ConnectionError:
+        return False, "Connection refused - Is the backend running?"
+    except requests.exceptions.Timeout:
+        return False, "Connection timeout"
+    except Exception as e:
+        return False, f"Error: {str(e)}"
 
 # --- Backend API Functions ---
 def call_backend_api(user_id, message, image_file=None):
@@ -362,6 +354,14 @@ with st.form("chat_form", clear_on_submit=True):
     
     if submitted:
         process_user_input(user_input, uploaded_file)
+
+# Display connection status AFTER the search bar
+is_connected, status_msg = test_backend_connection(api_url)
+if is_connected:
+    st.markdown(f'<div class="status-indicator status-connected">✅ Backend Connected: {status_msg}</div>', unsafe_allow_html=True)
+else:
+    st.markdown(f'<div class="status-indicator status-error">❌ Backend Disconnected: {status_msg}</div>', unsafe_allow_html=True)
+    st.warning("⚠️ Backend API is not available. Make sure to run `python api_server.py` first!")
 
 # --- Display Chat History ---
 if st.session_state["messages"]:
