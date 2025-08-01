@@ -9,8 +9,8 @@ import io
 
 # --- Page config and styling ---
 st.set_page_config(
-    page_title="Fashion AI Stylist",
-    page_icon="👗",
+    page_title="Fashion AI",
+    page_icon="✨",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -181,7 +181,8 @@ api_url = "http://localhost:8000"  # Your backend API URL
 user_id = "streamlit_user_01"      # Default user ID
 
 # --- Header and Introduction ---
-st.markdown('<div class="fashion-header">👗 Fashion AI Stylist</div>', unsafe_allow_html=True)
+st.markdown('<p class="logo">✨</p>', unsafe_allow_html=True)
+st.title("Ask our Fashion AI anything")
 
 # --- Suggestions Section ---
 st.write("### 💡 Quick Suggestions")
