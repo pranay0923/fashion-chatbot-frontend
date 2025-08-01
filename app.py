@@ -17,141 +17,177 @@ st.set_page_config(
 
 
 # Custom CSS for chat bubbles and better styling
+# Custom CSS for chat bubbles and better styling
 st.markdown("""
     <style>   
-    background-color: #f0f2f6;
-    background-image: radial-gradient(circle at center, #ffffff 50%, #e9eef5 100%);
-    min-height: 100vh;
+    .stApp {
+        background-color: #f7fafa;
+        background-image: radial-gradient(circle at center, #ffffff 50%, #e8f4f4 100%);
+        min-height: 100vh;
     }
-        body {
-            background: linear-gradient(135deg, #faf4f9, #fffdfc);
-            font-family: 'Segoe UI', sans-serif;
-        }
+    
+    body {
+        background: linear-gradient(135deg, #f0fdfc, #fef7f0);
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
 
-        .user-message {
-            background: linear-gradient(135deg, #EFC3E6, #F9D4F2);
-            padding: 12px 18px;
-            border-radius: 20px;
-            margin: 12px 0;
-            text-align: right;
-            color: #4A148C;
-            border: 1px solid #e1bee7;
-            font-weight: 500;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }
+    .user-message {
+        background: linear-gradient(135deg, #fed7aa, #fdba74);
+        padding: 12px 18px;
+        border-radius: 20px;
+        margin: 12px 0;
+        text-align: right;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
+        font-weight: 500;
+        box-shadow: 0 3px 8px rgba(251, 146, 60, 0.15);
+    }
 
-        .assistant-message {
-            background: linear-gradient(135deg, #D1C4E9, #EDE7F6);
-            padding: 12px 18px;
-            border-radius: 20px;
-            margin: 12px 0;
-            text-align: left;
-            color: #311B92;
-            border: 1px solid #ce93d8;
-            font-weight: 500;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }
+    .assistant-message {
+        background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+        padding: 12px 18px;
+        border-radius: 20px;
+        margin: 12px 0;
+        text-align: left;
+        color: #064e3b;
+        border: 1px solid #a7f3d0;
+        font-weight: 500;
+        box-shadow: 0 3px 8px rgba(16, 185, 129, 0.15);
+    }
 
-        .suggestion-button {
-            background-color: #f8f0fc;
-            border: 1px solid #e1bee7;
-            border-radius: 15px;
-            padding: 10px 14px;
-            margin: 6px;
-            cursor: pointer;
-            color: #6a1b9a;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
+    .suggestion-button {
+        background-color: #f0fdfa;
+        border: 1px solid #5eead4;
+        border-radius: 15px;
+        padding: 10px 14px;
+        margin: 6px;
+        cursor: pointer;
+        color: #0f766e;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
 
-        .suggestion-button:hover {
-            background-color: #f3e5f5;
-            color: #4a148c;
-        }
+    .suggestion-button:hover {
+        background-color: #ccfbf1;
+        color: #134e4a;
+        transform: translateY(-1px);
+    }
 
-        .fashion-header {
-            text-align: center;
-            font-size: 2.75em;
-            color: #6a1b9a;
-            font-weight: bold;
-            margin-bottom: 30px;
-            text-shadow: 1px 1px #f8bbd0;
-        }
+    .fashion-header {
+        text-align: center;
+        font-size: 2.75em;
+        background: linear-gradient(135deg, #0891b2, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px #fbbf24;
+    }
 
-        .recommendation-card {
-            background-color: #fff7f0;
-            border: 1px solid #ffe0b2;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 12px 0;
-            color: #5d4037;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
+    .recommendation-card {
+        background-color: #fffbeb;
+        border: 1px solid #fcd34d;
+        border-radius: 12px;
+        padding: 16px;
+        margin: 12px 0;
+        color: #92400e;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+    }
 
-        .status-indicator {
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            margin: 8px 0;
-            font-weight: 600;
-            display: inline-block;
-        }
+    .status-indicator {
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        margin: 8px 0;
+        font-weight: 600;
+        display: inline-block;
+    }
 
-        .status-connected {
-            background-color: #e8f5e9;
-            color: #388e3c;
-            border: 1px solid #c8e6c9;
-        }
+    .status-connected {
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
 
-        .status-error {
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ffcdd2;
-        }
+    .status-error {
+        background-color: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
 
-        input, textarea, .stTextInput>div>div>input {
-            background-color: #fdf7fb !important;
-            border-radius: 12px !important;
-            border: 1px solid #e0bee9 !important;
-            padding: 10px !important;
-            font-size: 16px !important;
-            color: #4a148c !important;
-        }
+    input, textarea, .stTextInput>div>div>input {
+        background-color: #f0fdfa !important;
+        border-radius: 12px !important;
+        border: 1px solid #5eead4 !important;
+        padding: 10px !important;
+        font-size: 16px !important;
+        color: #0f766e !important;
+    }
 
-        .stButton>button {
-            background: linear-gradient(135deg, #ba68c8, #f48fb1);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 22px;
-            font-weight: 600;
-            font-size: 16px;
-            transition: 0.3s ease;
-        }
+    .stButton>button {
+        background: linear-gradient(135deg, #0891b2, #f59e0b);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+    }
 
-        .stButton>button:hover {
-            background: linear-gradient(135deg, #ab47bc, #f06292);
-        }
+    .stButton>button:hover {
+        background: linear-gradient(135deg, #0e7490, #d97706);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(8, 145, 178, 0.4);
+    }
 
-        .stFileUploader {
-            background-color: #f3e5f5 !important;
-            border: 1px solid #d1c4e9 !important;
-            border-radius: 10px !important;
-        }
+    .stFileUploader {
+        background-color: #ecfdf5 !important;
+        border: 1px solid #6ee7b7 !important;
+        border-radius: 10px !important;
+    }
 
-        .stImage {
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    .stImage {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-        .st-expanderHeader {
-            font-weight: bold;
-            color: #6a1b9a;
-        }
+    .st-expanderHeader {
+        font-weight: bold;
+        color: #0f766e;
+    }
 
-        .stMarkdown {
-            font-size: 1rem;
-        }
+    .stMarkdown {
+        font-size: 1rem;
+    }
+
+    .custom-hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(to right, #0891b2, #f59e0b, #10b981);
+        box-shadow: 0 0 6px rgba(8, 145, 178, 0.4);
+        margin: 25px 0;
+        border-radius: 2px;
+    }
+
+    .footer-text {
+        text-align: center;
+        font-size: 0.9em;
+        font-weight: 600;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        background: linear-gradient(90deg, #06b6d4, #10b981, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: fadeIn 2s ease-in-out;
+        text-shadow: 0px 0px 6px rgba(6, 182, 212, 0.3);
+        margin-top: 30px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     </style>
 """, unsafe_allow_html=True)
 
