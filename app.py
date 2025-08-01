@@ -166,33 +166,5 @@ for msg in st.session_state["messages"]:
             unsafe_allow_html=True
         )
 
-# Test backend connection
-def test_backend_connection(api_url):
-    """Test if backend is available"""
-    try:
-        response = requests.get(f"{api_url}/health", timeout=5)
-        if response.status_code == 200:
-            data = response.json()
-            return True, data.get("message", "Connected")
-        else:
-            return False, f"HTTP {response.status_code}"
-    except requests.exceptions.ConnectionError:
-        return False, "Connection refused - Is the backend running?"
-    except requests.exceptions.Timeout:
-        return False, "Connection timeout"
-    except Exception as e:
-        return False, f"Error: {str(e)}"
-
-# Display connection status
-is_connected, status_msg = test_backend_connection(api_url)
-if is_connected:
-    st.markdown(f'<div class="status-indicator status-connected">✅ Backend Connected: {status_msg}</div>', unsafe_allow_html=True)
-else:
-    st.markdown(f'<div class="status-indicator status-error">❌ Backend Disconnected: {status_msg}</div>', unsafe_allow_html=True)
-    st.warning("⚠️ Backend API is not available. Make sure to run `python api_server.py` first!")
 
 
-<div class="footer-text">
-    ✨ Thank you for using the Fashion AI Stylist! Stay amazing, stay stylish!✨
-</div>
-""", unsafe_allow_html=True)
