@@ -177,7 +177,7 @@ input, textarea, .stTextInput>div>div>input {
 """, unsafe_allow_html=True)
 
 # --- Configuration ---
-api_url = "https://fashion-chatbot-szzt.onrender.com/chat"  # Fixed: Removed trailing slash
+api_url = "https://fashion-chatbot-szzt.onrender.com"  # Fixed: Removed trailing slash
 user_id = "streamlit_user_01"
 
 # --- Header and Introduction ---
@@ -460,4 +460,5 @@ st.markdown('''
     ✨ Thank you for using the Fashion AI Stylist! Stay amazing, stay stylish! ✨
 </div>
 ''', unsafe_allow_html=True)
+
 
