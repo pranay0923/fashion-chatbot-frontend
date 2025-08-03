@@ -113,31 +113,18 @@ header, footer {
 }
 
 .stButton>button {
-    background-color: #0b93f6 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 50% !important;
-    width: 50px !important;
-    height: 50px !important;
-    padding: 0 !important;
-    font-weight: 600 !important;
-    font-size: 18px !important;
-    transition: all 0.3s ease !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 auto !important;
-    box-shadow: 0 2px 8px rgba(11, 147, 246, 0.3) !important;
+    background-color: #0b93f6;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: 0.3s ease;
 }
 
 .stButton>button:hover {
-    background-color: #0084e3 !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(11, 147, 246, 0.4) !important;
-}
-
-.stButton>button:focus {
-    box-shadow: 0 0 0 3px rgba(11, 147, 246, 0.2) !important;
+    background-color: #0084e3;
 }
 
 input, textarea, .stTextInput>div>div>input {
@@ -185,13 +172,6 @@ input, textarea, .stTextInput>div>div>input {
 
 .bubble-container.assistant {
     justify-content: flex-start;
-}
-
-/* Custom button container styling */
-.button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -393,10 +373,8 @@ with st.form("chat_form", clear_on_submit=True):
         except Exception as e:
             st.error(f"Error loading image: {str(e)}")
     
-    # Submit button with arrow icon (matching your second image design)
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
-    submitted = st.form_submit_button("➤", type="primary")
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Submit button
+    submitted = st.form_submit_button("🔎 Send", type="primary")
     
     if submitted:
         process_user_input(user_input, uploaded_file)
