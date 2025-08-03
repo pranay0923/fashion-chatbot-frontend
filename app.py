@@ -1,4 +1,4 @@
-# Frontend.py
+# Frontend.py - Fixed version
 # Streamlit Frontend for Fashion Chatbot
 
 import streamlit as st
@@ -177,7 +177,7 @@ input, textarea, .stTextInput>div>div>input {
 """, unsafe_allow_html=True)
 
 # --- Configuration ---
-api_url = "https://fashion-chatbot-szzt.onrender.com"  # Fixed: Removed trailing slash
+api_url = "https://fashion-chatbot-szzt.onrender.com"
 user_id = "streamlit_user_01"
 
 # --- Header and Introduction ---
@@ -227,26 +227,20 @@ def test_backend_connection(api_url):
 
 # --- Backend API Functions ---
 def call_backend_api(user_id, message, image_file=None):
-    """Call the backend API with proper error handling"""
+    """Call the backend API with proper error handling - FIXED VERSION"""
     try:
+        # Always use form data to match backend expectations
+        data = {
+            "user_id": user_id,
+            "message": message
+        }
+        
+        files = {}
         if image_file is not None:
-            # Handle image upload
-            files = {
-                "image": (image_file.name, image_file.getvalue(), image_file.type)
-            }
-            data = {
-                "user_id": user_id,
-                "message": message
-            }
-            response = requests.post(f"{api_url}/chat", data=data, files=files, timeout=60)
-        else:
-            # Handle text-only request
-            headers = {"Content-Type": "application/json"}
-            data = {
-                "user_id": user_id,
-                "message": message
-            }
-            response = requests.post(f"{api_url}/chat", json=data, headers=headers, timeout=60)
+            files["image"] = (image_file.name, image_file.getvalue(), image_file.type)
+        
+        # Send as form data (not JSON) for consistency
+        response = requests.post(f"{api_url}/chat", data=data, files=files, timeout=60)
         
         response.raise_for_status()
         return response.json()
@@ -460,5 +454,3 @@ st.markdown('''
     ✨ Thank you for using the Fashion AI Stylist! Stay amazing, stay stylish! ✨
 </div>
 ''', unsafe_allow_html=True)
-
-
